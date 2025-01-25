@@ -1,4 +1,4 @@
-<div id="app-sidepanel" class="app-sidepanel"> 
+<div id="app-sidepanel" class="app-sidepanel">
     <div id="sidepanel-drop" class="sidepanel-drop"></div>
     <div class="sidepanel-inner d-flex flex-column" id="sidebar">
         <a href="" id="sidepanel-close" class="sidepanel-close"><i class="fa-solid fa-xmark"></i></a>
@@ -7,10 +7,10 @@
                 <img class="logo-icon " src="/images/logofood.png" alt="logo">
                 <img class="logo-icon-text " src="/images/Ngelapak.IDtext.png" alt="logotext">
             </a>
-        </div> 
+        </div>
         <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1 mt-3">
             <ul class="app-menu list-unstyled accordion">
-                
+
                 {{-- dashboard  --}}
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is("/") ? 'active' : '' }}" href="/">
@@ -21,7 +21,7 @@
                     </a>
                 </li>
 
-                @can('admin')
+                @role('owner')
                 <li class="nav-item has-submenu">
                     <a class="nav-link submenu-toggle {{ Request::is('user') ? 'active' : (Request::is('user/create') ? 'active' : '') }}" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="{{ Request::is('user') ? 'true' : (Request::is('user/create') ? 'true' : 'false') }}" aria-controls="submenu-3" role="button">
                         <span class="nav-icon">
@@ -39,10 +39,10 @@
                         </ul>
                     </div>
                 </li>
-                @endcan
+                @endrole
 
                 {{-- menu --}}
-                @can('manager')
+                @role('owner')
                 <li class="nav-item has-submenu">
                     <a class="nav-link submenu-toggle {{ Request::is('menu') ? 'active' : (Request::is('menu/create') ? 'active' : '') }}" data-bs-toggle="collapse" data-bs-target="#submenu-1" aria-expanded="{{ Request::is('menu') ? 'true' : (Request::is('menu/create') ? 'true' : 'false') }}" aria-controls="submenu-1" role="button">
                         <span class="nav-icon">
@@ -60,10 +60,10 @@
                         </ul>
                     </div>
                 </li>
-                @endcan
+                @endrole
 
                 {{-- transaction  --}}
-                @cannot('admin')
+                @role('owner')
                 <li class="nav-item has-submenu">
                     <a class="nav-link submenu-toggle {{ Request::is('transaction') ? 'active' : (Request::is('transaction/create') ? 'active' : '') }}" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="{{ Request::is('transaction') ? 'true' : (Request::is('transaction/create') ? 'true' : 'false') }}" aria-controls="submenu-2" role="button">
                         <span class="nav-icon">
@@ -76,20 +76,20 @@
                     </a>
                     <div id="submenu-2" class="collapse submenu submenu-2 {{ Request::is('transaction') ? 'collapse show' : (Request::is('transaction/create') ? 'collapse show' : 'collapse') }}" data-bs-parent="#menu-accordion">
                         <ul class="submenu-list list-unstyled">
-                            @can('manager')
+                            @role('owner')
                             <li class="submenu-item"><a class="submenu-link {{ Request::is('transaction') ? 'active' :  ''}}" href="/transaction">All Transaction's</a></li>
-                            @endcan
-                            @can('cashier')
+                            @endrole
+                            @role('cashier')
                             <li class="submenu-item"><a class="submenu-link {{ Request::is('transaction') ? 'active' :  ''}}" href="/transaction">All Transaction's</a></li>
                             <li class="submenu-item"><a class="submenu-link {{ Request::is('transaction/create') ? 'active' :  ''}}" href="/transaction/create">Make Order</a></li>
-                            @endcan
+                            @endrole
                         </ul>
                     </div>
                 </li>
-                @endcan
-                
+                @endrole
+
                 {{-- activityLog --}}
-                @cannot('cashier')
+                @role('owner')
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is("activityLog") ? 'active' : '' }}" href="/activityLog">
                         <span class="nav-icon">
@@ -98,7 +98,7 @@
                         <span class="nav-link-text">Activity Log</span>
                     </a>
                 </li>
-                @endcan
+                @endrole
 
             </ul>
         </nav>

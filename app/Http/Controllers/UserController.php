@@ -21,12 +21,12 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 1 || $user->level_id === 2) {
-            return redirect()->back();
+        if($user->hasRole('cashier')) {
+            return redirect('/');
         }
 
         return view('user.index', [
-            'users' => User::with('level')->get(),
+            'users' => User::all(),
         ]);
     }
 

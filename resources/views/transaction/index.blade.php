@@ -9,11 +9,11 @@
         <div class="row g-2 justify-content-start justify-content-md-end align-items-center">
             <div class="col-auto">
                 <form action="/transaction" method="GET" class="table-search-form row gx-1 align-items-center">
-                    <div class="col-auto">						    
+                    <div class="col-auto">
                         <select class="form-select w-auto" name="year">
                             @if (!request('year'))
                             <option value="0" selected disabled>Select Year</option>
-                            @else 
+                            @else
                             <option value="0" disabled>Select Year</option>
                             @endif
                             @php
@@ -23,7 +23,7 @@
                             @endphp
                             @for ( $i=$max; $i>=$min; $i-- )
                                 echo '<option value="{{ $i }}" {{ (request('year') == $i) ? 'selected' : ' ' }}>{{ $i }}</option>';
-                            @endfor 
+                            @endfor
                         </select>
                     </div>
                     <div class="col-auto">
@@ -82,9 +82,9 @@
                                 <th class="cell">Date</th>
                                 <th class="cell">Status</th>
                                 <th class="cell">Total</th>
-                                @can('cashier')
+                                @role('cashier')
                                 <th class="cell"></th>
-                                @endcan
+                                @endrole
                             </tr>
                         </thead>
                         <tbody>
@@ -110,24 +110,24 @@
                                     <td class="cell"><span>{{ $date->toFormattedDateString() }}</span><span class="note">{{ $time[4].' '.$time[5] }}</span></td>
                                     <td class="cell"><span class="badge {{ $item->status == 'paid' ? 'bg-success' : 'bg-danger'}}">{{ $item->status }}</span></td>
                                     <td class="cell">IDR. {{ number_format($item->total_transaction, 0, ',', '.') }}</td>
-                                    @can('cashier')
+                                    @role('cashier')
                                     <td class="cell"><a class="btn-sm app-btn-secondary" href="/transaction/{{ $item->id }}">View</a></td>
-                                    @endcan
+                                    @endrole
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-            </div>		
+            </div>
         </div>
         {{ $all->withQueryString()->links() }}
     </div>
-    
+
     <div class="tab-pane fade" id="orders-paid" role="tabpanel" aria-labelledby="orders-paid-tab">
         <div class="app-card app-card-orders-table mb-5">
             <div class="app-card-body">
                 <div class="table-responsive">
-                    
+
                     <table class="table mb-0 text-left">
                         <thead>
                             <tr>
@@ -137,9 +137,9 @@
                                 <th class="cell">Date</th>
                                 <th class="cell">Status</th>
                                 <th class="cell">Total</th>
-                                @can('cashier')
+                                @role('cashier')
                                 <th class="cell"></th>
-                                @endcan
+                                @endrole
                             </tr>
                         </thead>
                         <tbody>
@@ -165,15 +165,15 @@
                                     <td class="cell"><span>{{ $date->toFormattedDateString() }}</span><span class="note">{{ $time[4].' '.$time[5] }}</span></td>
                                     <td class="cell"><span class="badge {{ $item->status == 'paid' ? 'bg-success' : 'bg-danger'}}">{{ $item->status }}</span></td>
                                     <td class="cell">IDR. {{ number_format($item->total_transaction, 0, ',', '.') }}</td>
-                                    @can('cashier')
+                                    @role('cashier')
                                     <td class="cell"><a class="btn-sm app-btn-secondary" href="/transaction/{{ $item->id }}">View</a></td>
-                                    @endcan
+                                    @endrole
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-            </div>	
+            </div>
             {{ $today->links() }}
         </div>
     </div>
@@ -191,9 +191,9 @@
                                 <th class="cell">Date</th>
                                 <th class="cell">Status</th>
                                 <th class="cell">Total</th>
-                                @can('cashier')
+                                @role('cashier')
                                 <th class="cell"></th>
-                                @endcan
+                                @endrole
                             </tr>
                         </thead>
                         <tbody>
@@ -219,15 +219,15 @@
                                     <td class="cell"><span>{{ $date->toFormattedDateString() }}</span><span class="note">{{ $time[4].' '.$time[5] }}</span></td>
                                     <td class="cell"><span class="badge {{ $item->status == 'paid' ? 'bg-success' : 'bg-danger'}}">{{ $item->status }}</span></td>
                                     <td class="cell">IDR. {{ number_format($item->total_transaction, 0, ',', '.') }}</td>
-                                    @can('cashier')
+                                    @role('cashier')
                                     <td class="cell"><a class="btn-sm app-btn-secondary" href="/transaction/{{ $item->id }}">View</a></td>
-                                    @endcan
+                                    @endrole
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-            </div>		
+            </div>
         </div>
         {{ $thisMonth->links() }}
     </div>
@@ -293,5 +293,5 @@
             }
         }
     })
-</script>  
+</script>
 @endsection

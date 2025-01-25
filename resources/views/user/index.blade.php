@@ -22,9 +22,9 @@
                                     @foreach ($users as $user)
                                         <tr class="alert" role="alert">
                                             <td class="align-middle">
-                                                @if ($user->level->id === auth()->user()->id)
+                                                @if($user->hasRole('cashier'))
                                                 @else
-                                                    @if ($user->level->id === 1)
+                                                    @if ($user->hasRole('owner'))
                                                     <label class="checkbox-wrap checkbox-primary opacity-0 pe-none">
                                                         <input class="form-check-input text-info mt-0">
                                                         <span class="checkmark"></span>
@@ -34,7 +34,7 @@
                                                     @else
                                                     <label class="checkbox-wrap checkbox-primary">
                                                         <input class="form-check-input text-info mt-0" type="checkbox"
-                                                            name="users[]" data-role={{ $user->level->id }}
+                                                            name="users[]" data-role={{ $user->getRoleNames()->first() }}
                                                             value="{{ $user->id }}">
                                                         <span class="checkmark"></span>
                                                     </label>
@@ -45,7 +45,7 @@
                                             </td>
                                             <td class="d-flex align-items-center">
                                                 <div class="img rounded-circle"
-                                                    style="width: 50px; height: 50px; background-size: cover; background-position: center; background-image: url('<?= asset('storage/profile/' . $user->picture) ?>');">
+                                                    style="width: 50px; height: 50px; background-size: cover; background-position: center; background-image: url('{{ $user->picture ? asset('storage/profile/' . $user->picture) : asset('images/profil-default.png') }}');">
                                                 </div>
                                                 <div class="d-flex flex-column ms-4">
                                                     <span class="small">{{ $user->email }}</span>
@@ -56,7 +56,7 @@
                                             <td class="small align-middle">
                                                 {{ $user->username === auth()->user()->username ? $user->username . '(You)' : $user->username }}
                                             </td>
-                                            <td class="small align-middle level">{{ $user->level->level }}</td>
+                                            <td class="small align-middle level">{{ $user->getRoleNames() }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

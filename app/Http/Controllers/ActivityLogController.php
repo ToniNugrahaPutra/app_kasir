@@ -10,7 +10,7 @@ class ActivityLogController extends Controller
 {
     public function index ()
     {
-        $data = ActivityLog::with(['user', 'user.level'])->whereDate('created_at', Carbon::now())->latest()->get();
+        $data = ActivityLog::with(['user'])->whereDate('created_at', Carbon::now())->latest()->get();
         return view('activityLog', [
             'data' => $data
         ]);

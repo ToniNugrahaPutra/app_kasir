@@ -2,22 +2,16 @@
 
 @section('container')
 
-@can('manager')
+@role('owner')
     @section('container')
         @include('dashboard.manager')
     @endsection
-@endcan
+@endrole
 
-@can('admin')
-    @section('container')
-        @include('dashboard.admin')
-    @endsection
-@endcan
-
-@can('cashier')
+@role('cashier')
     @section('container')
         @include('dashboard.cashier')
     @endsection
-@endcan
+@endrole
 
 @endsection

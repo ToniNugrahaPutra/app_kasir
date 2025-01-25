@@ -1,6 +1,6 @@
-<div class="app-header-inner">  
+<div class="app-header-inner">
     <div class="container-fluid py-2">
-        <div class="app-header-content"> 
+        <div class="app-header-content">
             <div class="row justify-content-between align-items-center">
             <div class="col-auto">
                 <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
@@ -9,7 +9,7 @@
             </div>
             <div class="app-utilities col-auto">
                 <div class="app-utility-item app-user-dropdown dropdown">
-                    <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><img class="rounded-circle" src="{{ asset('storage/profile/'.auth()->user()->picture) }}" alt="user profile"></a>
+                    <a class="dropdown-toggle" id="user-dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"><img class="rounded-circle" src="{{ auth()->user()->picture ? asset('storage/profile/'.auth()->user()->picture) : asset('images/profil-default.png') }}" alt="user profile"></a>
                     <ul class="dropdown-menu" id="dropmenu" aria-labelledby="user-dropdown-toggle">
                         <li><a class="dropdown-item" href="/user/{{ auth()->user()->id }}">Account</a></li>
                         <li><hr class="dropdown-divider"></li>
