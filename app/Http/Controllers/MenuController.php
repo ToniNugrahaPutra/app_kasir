@@ -19,7 +19,7 @@ class MenuController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 2 || $user->level_id === 3) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
 
@@ -39,7 +39,7 @@ class MenuController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 2 || $user->level_id === 3) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
 
@@ -103,10 +103,10 @@ class MenuController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 2 || $user->level_id === 3) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
-        
+
         return view('menu.edit', [
             'menu' => $menu
         ]);
@@ -136,9 +136,9 @@ class MenuController extends Controller
 
         if ($request->file('picture')) {
             Storage::delete($menu->picture);
-            $validateddata['picture'] = $request->file('picture')->store('menu'); 
+            $validateddata['picture'] = $request->file('picture')->store('menu');
         }
-        
+
         Menu::where('id', $menu->id)
              ->update($validateddata);
 
@@ -159,7 +159,7 @@ class MenuController extends Controller
      */
     public function destroy(Menu $menu)
     {
-        Storage::delete($menu->picture);   
+        Storage::delete($menu->picture);
         $menu->destroy($menu->id);
         $activity = [
             'user_id' => Auth::id(),

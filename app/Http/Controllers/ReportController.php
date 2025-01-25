@@ -14,7 +14,7 @@ class ReportController extends Controller
         $user = Auth::user();
         $data = '';
 
-        if ($user->level_id == 1) {
+        if ($user->hasRole('owner')) {
             if ($request->data == 'all') {
                 $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
                                 ->where('status', 'paid')
@@ -54,7 +54,7 @@ class ReportController extends Controller
                                     ->get();
                 }
             }
-            
+
         } else {
             if ($request->data == 'all') {
                 $data = Transaction::with(['transaction_details', 'transaction_details.menu'])

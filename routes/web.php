@@ -34,7 +34,7 @@ Route::resource('/transaction', TransactionController::class)->middleware('auth'
 Route::resource('/user', UserController::class)->middleware('auth')->missing(fn () => redirect()->back());
 Route::post('/user/delete', [UserController::class, 'destroy'])->middleware('auth');
 Route::get('/user/edit/{user}', function (User $user) {
-    if (Auth::user()->level_id !== $user->level_id) {
+    if (!$user->hasRole('owner')) {
         return redirect()->back();
     }
     return view('account.edit', [

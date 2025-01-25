@@ -39,7 +39,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 1 || $user->level_id === 2) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
 
@@ -88,7 +88,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        if (Auth::user()->level_id !== $user->level_id) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
 
@@ -106,7 +106,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        if (Auth::user()->level_id === 1 || Auth::user()->level_id === 2) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
 

@@ -39,11 +39,10 @@
             <div class="mb-4">
                 <label for="setting-input-4" class="form-label">Role</label>
                 <select class="form-select @error('level_id') is-invalid @enderror" id="setting-input-4" name="level_id" required>
-                    @if ($users->level_id == 1)
-                        <option value="1" selected>Manager</option>
+                    @if ($users->hasRole('owner'))
+                        <option value="owner" selected>Owner</option>
                     @else
-                        <option value="2" @if (old('level_id', $users->level_id) == "2" ) {{ 'selected' }} @endif>Cashier</option>
-                        <option value="3" @if (old('level_id', $users->level_id) == "3" ) {{ 'selected' }} @endif>Admin</option>
+                        <option value="cashier" {{ $users->hasRole('cashier') ? 'selected' : '' }}>Cashier</option>
                     @endif
                 </select>
                 @error('level_id')

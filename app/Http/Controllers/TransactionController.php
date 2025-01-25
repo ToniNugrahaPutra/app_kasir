@@ -20,11 +20,11 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 3) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
 
-        if ($user->level_id == 1) {
+        if ($user->hasRole('owner')) {
             $all = Transaction::with(['transaction_details', 'transaction_details.menu'])
                                 ->where('status', 'paid')
                                 ->latest()
@@ -58,9 +58,9 @@ class TransactionController extends Controller
                                 ->filter(request(['year', 'month']))
                                 ->paginate(5);
         }
-    
+
         return view('transaction.index', [
-            'all' => $all, 
+            'all' => $all,
             'today' => $today,
             'thisMonth' => $thisMonth
         ]);
@@ -75,10 +75,10 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 1 || $user->level_id === 3) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
-        
+
         return view('transaction.create', [
             'foods' => $menu->where('category','food')->latest()->get(),
             'drinks' => $menu->where('category', 'drink')->latest()->get(),
@@ -97,7 +97,7 @@ class TransactionController extends Controller
     {
         $transaction = $request->validate([
             'no_table' => 'required',
-            'total_transaction' => 'required' 
+            'total_transaction' => 'required'
         ]);
         $transaction['user_id'] = auth()->user()->id;
         $transaction['total_payment'] = 0;
@@ -134,10 +134,10 @@ class TransactionController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->level_id === 1 || $user->level_id === 3) {
+        if (!$user->hasRole('owner')) {
             return redirect()->back();
         }
-        
+
         return view('transaction.show', [
             'data' => $transaction->with(['transaction_details','transaction_details.menu','user'])->where('id', '=', $transaction->id)->get()
         ]);
@@ -163,7 +163,7 @@ class TransactionController extends Controller
      */
     public function update(Request $request, Transaction $transaction)
     {
-        
+
         $validateddata = $request->validate([
             'total_transaction' => 'required|numeric',
             'total_payment' => 'required|numeric|gte:total_transaction'
@@ -171,12 +171,12 @@ class TransactionController extends Controller
 
         $validateddata["total_payment"] = filter_var($request->total_payment, FILTER_SANITIZE_NUMBER_INT);
         $validateddata["status"] = 'paid';
-      
+
         Transaction::where('id', $transaction->id)
                     ->update($validateddata);
-        
+
         return redirect('/transaction')->with('success', 'transaction successfully !');
-        
+
     }
 
     /**
@@ -190,5 +190,5 @@ class TransactionController extends Controller
         //
     }
 
-   
+
 }

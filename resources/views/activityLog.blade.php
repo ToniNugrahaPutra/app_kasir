@@ -21,7 +21,7 @@
                 }
             </style>
             <div class="d-flex justify-content-between">
-                <div><span class="text-light-green">{{ $item->user->name }} </span> &nbsp {{ $item->action }} <p class="small">{{ $item->user->getRoleNames() }}</p> </div>
+                <div><span class="text-light-green">{{ $item->user->name }} </span> &nbsp {{ $item->action }} <p class="small">{{ $item->user->getRoleNames()->first() }}</p> </div>
                 <p>{{ $item->created_at->diffForHumans() }}</p>
             </div>
             </li>

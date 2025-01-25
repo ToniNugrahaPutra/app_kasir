@@ -56,7 +56,7 @@
                                             <td class="small align-middle">
                                                 {{ $user->username === auth()->user()->username ? $user->username . '(You)' : $user->username }}
                                             </td>
-                                            <td class="small align-middle level">{{ $user->getRoleNames() }}</td>
+                                            <td class="small align-middle level">{{ $user->getRoleNames()->first() }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
