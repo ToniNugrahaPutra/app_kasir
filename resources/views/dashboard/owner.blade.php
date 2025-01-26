@@ -72,7 +72,7 @@
                                 class="rounded" />
                         </div>
                     </div>
-                    <span class="fw-semibold d-block mb-1 text-dark">Income</span>
+                    <span class="fw-semibold d-block mb-1 text-dark">Pendapatan</span>
                     <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>Rp {{ number_format($total_income[0]->total_income,0,',','.') }} </small>
                 </div>
             </div>
@@ -86,7 +86,7 @@
                                 class="rounded" />
                         </div>
                     </div>
-                    <span class="fw-semibold d-block mb-1 text-dark">Invoice</span>
+                        <span class="fw-semibold d-block mb-1 text-dark">Invoice</span>
                     <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i> {{ $invoice[0]->total_invoice }}</small>
                 </div>
             </div>

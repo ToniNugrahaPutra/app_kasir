@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaction;
 use App\Models\Menu;
-use App\Models\TransactionDetail;
+use App\Models\Category;
+use App\Models\Customer;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
@@ -19,10 +21,6 @@ class TransactionController extends Controller
     public function index()
     {
         $user = Auth::user();
-
-        if (!$user->hasRole('owner')) {
-            return redirect()->back();
-        }
 
         if ($user->hasRole('owner')) {
             $all = Transaction::with(['transaction_details', 'transaction_details.menu'])
@@ -71,20 +69,14 @@ class TransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Menu $menu)
+    public function create()
     {
-        $user = Auth::user();
+        $customers = Customer::all();
+        $menus = Menu::all();
+        $categories = Category::all();
+        $tables = Transaction::select('no_table')->where('status','unpaid')->get();
 
-        if (!$user->hasRole('owner')) {
-            return redirect()->back();
-        }
-
-        return view('transaction.create', [
-            'foods' => $menu->where('category','food')->latest()->get(),
-            'drinks' => $menu->where('category', 'drink')->latest()->get(),
-            'desserts' => $menu->where('category', 'dessert')->latest()->get(),
-            'tables' => Transaction::select('no_table')->where('status','unpaid')->get()
-        ]);
+        return view('transaction.create', compact('customers', 'menus', 'categories', 'tables'));
     }
 
     /**

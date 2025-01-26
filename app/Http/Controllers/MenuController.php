@@ -2,32 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityLog;
 use App\Models\Menu;
+use App\Models\Category;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Menu $menu)
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:owner');
+    }
+
+    public function index()
     {
         $user = Auth::user();
+        $categories = Category::all();
+        $menus = Menu::with('category')->get();
 
-        if (!$user->hasRole('owner')) {
-            return redirect()->back();
-        }
-
-        return view('menu.index', [
-            'foods' => $menu->where('category','food')->latest()->get(),
-            'drinks' => $menu->where('category', 'drink')->latest()->get(),
-            'dessert' => $menu->where('category', 'dessert')->latest()->get()
-        ]);
+        return view('menu.index', compact('categories', 'menus'));
     }
 
     /**
@@ -38,12 +35,8 @@ class MenuController extends Controller
     public function create()
     {
         $user = Auth::user();
-
-        if (!$user->hasRole('owner')) {
-            return redirect()->back();
-        }
-
-        return view('menu.add');
+        $categories = Category::all();
+        return view('menu.add', compact('categories'));
     }
 
     /**

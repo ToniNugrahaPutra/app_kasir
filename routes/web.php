@@ -29,9 +29,7 @@ Route::get('/login', [LoginController::class, 'index'])->name('login')->middlewa
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
-Route::resource('/menu', MenuController::class)->middleware('auth')->missing(fn () => redirect()->back());
-Route::resource('/transaction', TransactionController::class)->middleware('auth')->missing(fn () => redirect()->back());
-Route::resource('/user', UserController::class)->middleware('auth')->missing(fn () => redirect()->back());
+Route::resource('/user', UserController::class)->middleware('auth');
 Route::post('/user/delete', [UserController::class, 'destroy'])->middleware('auth');
 Route::get('/user/edit/{user}', function (User $user) {
     if (!$user->hasRole('owner')) {
@@ -43,9 +41,12 @@ Route::get('/user/edit/{user}', function (User $user) {
 })->middleware('auth');
 Route::post('/user/edit/{user}', [UserController::class, 'updateProfile'])->middleware('auth');
 
-Route::get('/menus/shows', [MenuController::class, 'show']);
+Route::resource('/menu', MenuController::class)->middleware('auth');
+Route::get('/menus/shows', [MenuController::class, 'show'])->name('menus.show');
 
-Route::get('/activityLog', [ActivityLogController::class, 'index']);
+Route::resource('/transaction', TransactionController::class)->middleware('auth');
+
+Route::get('/activityLog', [ActivityLogController::class, 'index'])->name('activityLog');
 
 Route::get('/invoice/{transaction}', function (Transaction $transaction) {
     return View('transaction.invoice', [

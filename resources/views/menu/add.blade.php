@@ -34,13 +34,13 @@
             </div>
             <div class="mb-4">
                 <label for="category" class="form-label">Category</label>
-                <select class="form-select @error('category') is-invalid @enderror" id="category" name="category" required>
+                <select class="form-select @error('category') is-invalid @enderror" id="category" name="category_id" required>
                     <option selected disabled hidden>- select category -</option>
-                    <option value="food"  @if (old('category') == "food") {{ 'selected' }} @endif >Food</option>
-                    <option value="drink"  @if (old('category') == "drink") {{ 'selected' }} @endif >Drink</option>
-                    <option value="dessert"  @if (old('category') == "dessert") {{ 'selected' }} @endif >Dessert</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->id }}"  @if (old('category_id') == $category->id) {{ 'selected' }} @endif >{{ $category->name }}</option>
+                    @endforeach
                 </select>
-                @error('category')
+                @error('category_id')
                     <div class="invalid-feedback">
                         {{ $message }}
                     </div>
@@ -78,7 +78,7 @@
         const img_preview = document.querySelector('.img-preview');
         const view_path_img = document.querySelector('.view-path-img');
         const select_image = document.querySelector('.select-image');
-        
+
         img.addEventListener('change', function() {
             const files = img.files[0];
             const fileReader = new FileReader();
