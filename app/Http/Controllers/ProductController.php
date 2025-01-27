@@ -2,27 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Menu;
+use App\Models\Product;
 use App\Models\Category;
 use App\Models\ActivityLog;
+use App\Models\ProductPrice;
 use Illuminate\Http\Request;
+use App\Models\PriceCategory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class MenuController extends Controller
+class ProductController extends Controller
 {
-
-    public function __construct()
-    {
-        $this->middleware('auth');
-        $this->middleware('role:owner');
-    }
-
     public function index()
     {
-        $user = Auth::user();
-        $categories = Category::all();
-        $menus = Menu::with('category')->get();
+        $categories = Category::where('outlet_id', session('outlet_id'))->get();
+        $menus = Product::with('category')->where('outlet_id', session('outlet_id'))->get();
 
         return view('menu.index', compact('categories', 'menus'));
     }
@@ -86,23 +80,18 @@ class MenuController extends Controller
         return $menu;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Menu  $menu
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Menu $menu)
+    public function edit($id)
     {
-        $user = Auth::user();
+        $outletId = session('outlet_id');
+        $product = Product::where('id', $id)->where('outlet_id', $outletId)->first();
+        $categories = Category::where('outlet_id', $outletId)->get();
+        $productPrice = ProductPrice::where('product_id', $product->id)->get();
+        $priceCategories = PriceCategory::all();
 
-        if (!$user->hasRole('owner')) {
-            return redirect()->back();
+        if(auth()->user()->hasRole('owner')){
+            return view('menu.edit', compact('product', 'categories', 'productPrice', 'priceCategories'));
         }
-
-        return view('menu.edit', [
-            'menu' => $menu
-        ]);
+        return redirect()->back();
     }
 
     /**

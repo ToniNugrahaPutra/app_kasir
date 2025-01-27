@@ -2,45 +2,29 @@
 <html lang="en">
 <head>
     <title>
-        {{
-            Request::is('/') ? 'Dashboard' :
-            (Request::is('activityLog') ? 'ActivityLog' :
-            (Request::is('menu') ? 'Alls Menu' :
-            (Request::is('menu/create') ? 'Add New Menu' :
-            (Request::is('menu/*/edit') ? 'Edit Menu' :
-            (Request::is('transaction') ? 'Transaction' :
-            (Request::is('transaction/create') ? 'Make Order' :
-            (Request::is('user') ? 'Alls employee' :
-            (Request::is('user/create') ? 'Add New employee' :
-            (Request::is('account') ? 'My Account' :
-            (Request::is('user/*/edit') ? 'Edit employee' :
-            (Request::is('user/edit/*') ? 'Edit Profile' :
-            (Request::is('user/*') ? 'My Profile' :
-            'appantuh'
-            ))))))))))))
-        }}
+        @yield('title')
     </title>
 
     <!-- Meta -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="/images/logofood.ico">
+    <link rel="shortcut icon" href="{{ asset('images/logofood.ico') }}">
 
     <!-- FontAwesome JS-->
-    <script defer src="/plugins/fontawesome/js/all.min.js"></script>
+    <script defer src="{{ asset('plugins/fontawesome/js/all.min.js') }}"></script>
 
     <!-- App CSS -->
-    <link rel="stylesheet" href="/css/portal.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/fontawesome-free-6.2.1-web/css/all.css">
+    <link rel="stylesheet" href="{{ asset('css/portal.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('plugins/fontawesome/css/all.min.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     {{-- trix --}}
-    <link rel="stylesheet" type="text/css" href="/css/trix.css">
-    <script type="text/javascript" src="/js/trix.umd.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/trix.css') }}">
+    <script type="text/javascript" src="{{ asset('js/trix.umd.min.js') }}"></script>
 
     <style>
         body {
@@ -81,11 +65,11 @@
             </div>
         </div>
     </div>
-    <script src="/js/jquery-3.6.3.min.js"></script>
-    <script src="/plugins/popper.min.js"></script>
-    <script src="/plugins/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/js/app.js"></script>
-    <script src="/js/password.js"></script>
+    <script src="{{ asset('js/jquery-3.6.3.min.js') }}"></script>
+    <script src="{{ asset('plugins/popper.min.js') }}"></script>
+    <script src="{{ asset('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/password.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', 'Menu')
+
 @section('container')
     <h1 class="app-page-title mb-2">Daftar Menu</h1>
     <div class="menu mb-4">
@@ -16,13 +18,13 @@
 
     <div class="tab-content" data-aos="fade-up" data-aos-delay="300">
         @foreach ($categories as $category)
-        <div class="tab-pane {{ $loop->first ? 'fade active show' : '' }}" id="{{ $category->name }}">
+        <div class="tab-pane fade {{ $loop->first ? 'active show' : '' }}" id="{{ $category->name }}">
             <div class="row g-4">
                     @foreach ($menus->where('category_id', $category->id) as $menu)
-                        <div class="col-6 col-md-4 col-xl-3 col-xxl-2 mb-4 mb-lg-0">
-                            <div class="card rounded shadow-sm h-100 app-card-doc border-0 card-menu bg-white">
-                            <div class="card-body p-4"><img src="{{ asset('storage/' . $menu->picture) }}" alt=""
-                                    class="img-fluid d-block mx-auto mb-3">
+                        <div class="col-sm-6 col-md-3 col-lg-3 mb-4 mb-lg-0">
+                            <div class="card rounded shadow-sm app-card-doc border-0 card-menu bg-white">
+                            <div class="card-body p-4">
+                                <img src="{{ asset('storage/products/' . $menu->image) }}" alt="" class="img-fluid d-block mx-auto mb-3">
                                 <div class="d-flex justify-content-between">
                                     <h5 class="col-11 text-banner text-primary text-capitalize">{{ $menu->name }}</h5>
                                     <div class="app-card-actions">
@@ -57,8 +59,9 @@
                                         </div>
                                     </div>
                                 </div>
-                                <p class="small price">IDR <span
-                                    class="nominal">{{ number_format($menu->retail_price, 0, ',', '.') }}</span></p>
+                                <p class="small price">IDR
+                                    <span class="nominal">{{ number_format($menu->productPrice->where('price_category_id', 1)->first()->price, 0, ',', '.') }}</span>
+                                </p>
                             </div>
                         </div>
                     </div>

@@ -45,9 +45,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function outlet()
+    public function outlets()
     {
-        return $this->belongsTo(Outlet::class, 'outlet_id');
+        return $this->hasMany(Outlet::class, 'owner_id', 'id');
     }
 
     public function transaction()

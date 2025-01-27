@@ -19,44 +19,34 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($users as $user)
+                                    @foreach ($users as $employee)
                                         <tr class="alert" role="alert">
                                             <td class="align-middle">
-                                                @if($user->hasRole('cashier'))
-                                                @else
-                                                    @if ($user->hasRole('owner'))
-                                                    <label class="checkbox-wrap checkbox-primary opacity-0 pe-none">
-                                                        <input class="form-check-input text-info mt-0">
-                                                        <span class="checkmark"></span>
-                                                    </label>
-                                                    <a href="/user/{{ $user->id }}/edit" class="text-warning"><i
-                                                            class="fa-regular fa-pen-to-square mb-1 ms-2"></i></a>
-                                                    @else
-                                                    <label class="checkbox-wrap checkbox-primary">
+                                                <a href="{{ route('user.edit', $employee->user->id) }}"
+                                                    class="text-warning me-2">
+                                                    <i class="fa-regular fa-pen-to-square mb-1 ms-2"></i>
+                                                </a>
+                                                <label class="checkbox-wrap checkbox-primary">
                                                         <input class="form-check-input text-info mt-0" type="checkbox"
-                                                            name="users[]" data-role={{ $user->getRoleNames()->first() }}
-                                                            value="{{ $user->id }}">
+                                                            name="users[]" data-role={{ $employee->user->getRoleNames()->first() }}
+                                                            value="{{ $employee->user->id }}">
                                                         <span class="checkmark"></span>
                                                     </label>
-                                                    <a href="/user/{{ $user->id }}/edit" class="text-warning"><i
-                                                            class="fa-regular fa-pen-to-square mb-1 ms-2"></i></a>
-                                                    @endif
-                                                @endif
                                             </td>
                                             <td class="d-flex align-items-center">
                                                 <div class="img rounded-circle"
-                                                    style="width: 50px; height: 50px; background-size: cover; background-position: center; background-image: url('{{ $user->picture ? asset('storage/profile/' . $user->picture) : asset('images/profil-default.png') }}');">
+                                                    style="width: 35px; height: 35px; background-size: cover; background-position: center; background-image: url('{{ $employee->user->picture ? asset('storage/profile/' . $employee->user->picture) : asset('images/profil-default.png') }}');">
                                                 </div>
                                                 <div class="d-flex flex-column ms-4">
-                                                    <span class="small">{{ $user->email }}</span>
+                                                    <span class="small">{{ $employee->user->email }}</span>
                                                     <span class="small">Added:
-                                                        {{ $user->created_at->format('d/m/Y') }}</span>
+                                                        {{ $employee->created_at->format('d/m/Y') }}</span>
                                                 </div>
                                             </td>
                                             <td class="small align-middle">
-                                                {{ $user->username === auth()->user()->username ? $user->username . '(You)' : $user->username }}
+                                                {{ $employee->user->username === auth()->user()->username ? $employee->user->username . '(You)' : $employee->user->username }}
                                             </td>
-                                            <td class="small align-middle level">{{ $user->getRoleNames()->first() }}</td>
+                                            <td class="small align-middle level">{{ $employee->user->getRoleNames()->first() }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
