@@ -174,7 +174,7 @@
                     <div class="section-pay d-flex justify-content-between align-items-center p-2">
                         <h6 class="text-white">Choose Table</h6>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#table">chosee</button>
+                            data-bs-target="#table">Choose</button>
                     </div>
                 </div>
                 <button type="submit"
