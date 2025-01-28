@@ -23,7 +23,7 @@
 			    <div class="app-auth-body mx-auto">	
 				    <div class="app-auth-branding mb-4">
 						<a class="app-logo" href="index.html">
-							<img class="logo-icon me-2" src="/images/logofood.png" alt="logo">
+							<img class="logo-icon me-2" src="/images/logo.png" alt="logo" style="width: 200px">
 						</a>
 					</div>
 					<h2 class="auth-heading text-center mb-5">Login to Ngelapak.ID</h2>
@@ -72,7 +72,7 @@
 				    <div class="h-100"></div>
 				    <div class="overlay-content p-3 p-lg-4 rounded">
 					    <h5 class="mb-3 overlay-title">Motivation for today</h5>
-					    <div>Our task is not only to serve delicious food but also to provide friendly and efficient service. Focus on good service quality and success will follow.</div>
+					    <div>Stay consistent with the concept and ideas for a better Indonesia.</div>
 				    </div>
 				</div>
 		    </div>

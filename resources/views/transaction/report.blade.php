@@ -19,7 +19,7 @@
 <div class="container">
         <div class="row my-5 d-flex flex-column justify-content-between">
             <div class="col d-flex flex-column align-items-center">
-                <img src="/images/logofood.png" class="mb-3" alt="" srcset="" width="60">
+                <img src="/images/logo.png" class="mb-3" alt="" srcset="" width="100">
                 <h2>Ngelapak.ID</h2>
                 <p class="mb-1">Jl M. H. Thamrin, No. 9</p>
                 <p class="mb-1">221-691-6080</p>

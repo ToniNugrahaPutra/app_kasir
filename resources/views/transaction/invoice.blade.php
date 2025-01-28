@@ -78,7 +78,7 @@
                 <h2 class="float-end total-payment">{{ number_format($key->total_payment, 0, ',', '.') }}</h2>
             @endforeach
             <div class="text-center" style="margin-top: 90px;">
-                <p class="mb-0 d-flex align-items-center justify-content-center"><u class="text-info text-decoration-none"><img src="/images/logofood.png" alt="" srcset="" width="20">Ngelapak.ID</u></p>
+                <p class="mb-0 d-flex align-items-center justify-content-center"><u class="text-info text-decoration-none"><img src="/images/logo.png" alt="" srcset="" width="20">Ngelapak.ID</u></p>
                 <p>Thanks for joining us at Ngelapak.ID. </p>
             </div>
 
