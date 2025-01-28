@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Product;
+use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TransactionDetail extends Model
 {
     use HasFactory;
-    
+
     protected $guarded = ['id'];
 
     public function transaction()
@@ -16,8 +18,8 @@ class TransactionDetail extends Model
         return $this->belongsTo(Transaction::class);
     }
 
-    public function menu()
+    public function product()
     {
-        return $this->belongsTo(Menu::class);
+        return $this->belongsTo(Product::class);
     }
 }

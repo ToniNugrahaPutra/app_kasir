@@ -1,5 +1,23 @@
 @extends('layouts.order')
 
+@push('styles')
+    <style>
+        .sidepanel-hidden {
+            left: -400px;
+        }
+        .sidepanel-visible {
+            left: 0;
+        }
+        .card-image-top {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+@endpush
+
 @section('container')
     @php
         $tables = json_encode($tables);
@@ -12,15 +30,12 @@
     <div class="col-md-8 p-0 h-100 flex flex-column justify-content-between">
         <div class="hd-menu d-flex align-items-center justify-content-between shadow bg-white">
             <div class="col-sm-5 d-flex align-items-center">
-                <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"
-                            d="M4 7h22M4 15h22M4 23h22"></path>
-                    </svg>
+                <a id="back-to-dashboard" class="sidepanel-toggler d-inline-block" href="{{ route('home') }}">
+                    <i class="fas fa-arrow-left text-black"></i>
                 </a>
-                <h5 class="fs-5 fw-bold text-black ms-4">Daftar Menu</h5>
+                <h5 class="fs-5 fw-bold text-black ms-4 mb-0">Daftar Menu</h5>
             </div>
-            {{-- <div class="col-sm-7 d-flex align-items-center search-container-tr">
+            <div class="col-sm-5 d-flex align-items-center search-container-tr">
                 <div class="search-mobile-trigger search-icon-transaction">
                     <i class="search-mobile-trigger-icon fas fa-search"></i>
                 </div>
@@ -31,41 +46,65 @@
                                 class="fas fa-search"></i></button>
                     </form>
                 </div>
-            </div> --}}
+            </div>
         </div>
         <div class="wp-menu d-flex flex-column">
+            <div class="row">
             <div class="menu-tr mt-3 mb-3">
                 <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#all">
+                            <h4>Semua</h4>
+                        </a>
+                    </li>
                     @foreach ($categories as $category)
                     <li class="nav-item">
-                        <a class="nav-link {{ $loop->first ? 'active' : '' }}" data-bs-toggle="tab" data-bs-target="#{{ $category->name }}">
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#{{ $category->name }}">
                             <h4>{{ $category->name }}</h4>
                         </a>
                     </li>
                     @endforeach
                 </ul>
+                </div>
             </div>
-            <div class="tab-content menu-tab overflow-auto" style="height: 85%" data-aos="fade-up" data-aos-delay="300">
+            <div class="tab-content menu-tab overflow-hidden" style="height: 85%" data-aos="fade-up" data-aos-delay="300">
+                <div class="tab-pane fade show active" id="all">
+                    <div class="row mt-2 px-3">
+                            @foreach ($products as $product)
+                            <div class="col-md-3 col-sm-6">
+                                <div class="d-flex flex-column bg-white rounded shadow h-100" data-id="{{ $product->id }}">
+                                    <img class="rounded card-image-top" src="{{ asset('storage/products/' . $product->image) }}">
+                                    <div class="d-flex justify-content-center flex-column p-2">
+                                        <p class="text-left mt-2 fs-6 fw-bold text-primary">{{ Str::limit($product->name, 18) }}</p>
+                                        <div class="text-left">
+                                            <small class="text-bold">Rp <span class="fw-bold">{{ number_format($product->productPrice->where('price_category_id', 1)->first()->price ?? 0, 0, ',', '.') }}</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                    </div>
+                </div>
                 @foreach ($categories as $category)
-                <div class="tab-pane {{ $loop->first ? 'fade active show' : '' }}" id="{{ $category->name }}">
+                <div class="tab-pane fade" id="{{ $category->name }}">
                     <div class="menu-content pe-4 ps-4 d-flex flex-wrap justify-content-between">
-                        @foreach ($menus->where('category_id', $category->id) as $menu)
+                        @foreach ($products->where('category_id', $category->id) as $product)
                             <div class="menu-item-cart rounded shadow d-flex align-items-center justify-content-around"
-                                data-id="{{ $menu->id }}" style="margin-bottom: 7%;">
-                                <img class="img-fluid" src="{{ asset('storage/' . $menu->picture) }}" alt=""
+                                data-id="{{ $product->id }}" style="margin-bottom: 7%;">
+                                <img class="img-fluid" src="{{ asset('storage/products/' . $product->image) }}" alt=""
                                     srcset="" width="150">
                                 <div class="d-flex justify-content-center flex-column">
                                     <div class="product">
-                                        <h5 style="font-size: 16px; width: 100px;" class="text-break">{{ $menu->name }}</h5>
-                                        <h6 style="font-size: 13px;">{{ number_format($menu->retail_price, 0, ',', '.') }}</h6>
+                                        <h5 style="font-size: 16px; width: 100px;" class="text-break">{{ $product->name }}</h5>
+                                        {{-- <h6 style="font-size: 13px;">{{ number_format($product->retail_price, 0, ',', '.') }}</h6> --}}
                                     </div>
                                     <div class="qty d-flex mt-3">
-                                        <button class="border-0 rounded bg-transparent RemovetoCart"><i
+                                        <button class="border-0 rounded bg-transparent RemovetoCart" data-id="{{ $product->id }}"><i
                                                 class="fa-solid fa-minus" style="font-size: 12px;"></i></button>
                                         <div class="qty-numbers me-3 ms-3">
                                             0
                                         </div>
-                                        <button class="border-0 rounded bg-transparent AddtoCart"><i
+                                        <button class="border-0 rounded bg-transparent AddtoCart" data-id="{{ $product->id }}"><i
                                                 class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
                                     </div>
                                 </div>
@@ -294,3 +333,13 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            let sidePanel = $('#app-sidepanel');
+            sidePanel.removeClass('sidepanel-visible');
+            sidePanel.addClass('sidepanel-hidden');
+        });
+    </script>
+@endpush

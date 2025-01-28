@@ -43,7 +43,6 @@ Route::get('/user/edit/{user}', function (User $user) {
 Route::post('/user/edit/{user}', [UserController::class, 'updateProfile'])->middleware('auth');
 
 Route::resource('/menu', ProductController::class)->middleware('auth');
-Route::get('/menus/shows', [ProductController::class, 'show'])->name('menus.show');
 
 Route::resource('/transaction', TransactionController::class)->middleware('auth');
 

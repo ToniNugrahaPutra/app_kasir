@@ -22,15 +22,24 @@
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/fontawesome-free-6.2.1-web/css/all.css">
     <link rel="stylesheet" href="/css/payment.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+    @stack('styles')
 </head>
 
 <body>
     <header>
         @include('layouts.sidebar')
     </header>
-    <div class="app-wrapper">
+    <div class="app-wrapper" style="margin-left: {{ request()->routeIs('transaction.create') ? '0' : '250px' }}">
         <div class="app-content">
-            <div class="container-xl page-order">
+            <div class="container-xxl page-order">
                 <div class="row h-100">
                     @yield('container')
                 </div>
@@ -42,6 +51,7 @@
     <script src="{{ asset('js/app.js') }}"></script>
     <script src="{{ asset('js/order.js') }}"></script>
     <script src="{{ asset('js/formatmoney.js') }}"></script>
+    @stack('scripts')
 </body>
 </html>
 

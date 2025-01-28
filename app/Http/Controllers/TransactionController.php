@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Product;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Transaction;
@@ -23,34 +24,34 @@ class TransactionController extends Controller
         $user = Auth::user();
 
         if ($user->hasRole('owner')) {
-            $all = Transaction::with(['transaction_details', 'transaction_details.menu'])
+            $all = Transaction::with(['transaction_details', 'transaction_details.product'])
                                 ->where('status', 'paid')
                                 ->latest()
                                 ->filter(request(['year', 'month']))
                                 ->paginate(5);
-            $today = Transaction::with(['transaction_details', 'transaction_details.menu'])
+            $today = Transaction::with(['transaction_details', 'transaction_details.product'])
                                 ->where('status', 'paid')
                                 ->whereDate('created_at',Carbon::now())
                                 ->latest()
                                 ->filter(request(['year', 'month']))
                                 ->paginate(5);
-            $thisMonth = Transaction::with(['transaction_details', 'transaction_details.menu'])
+            $thisMonth = Transaction::with(['transaction_details', 'transaction_details.product'])
                                 ->where('status', 'paid')
                                 ->whereMonth('created_at',Carbon::now()->month)
                                 ->latest()
                                 ->filter(request(['year', 'month']))
                                 ->paginate(5);
         } else {
-            $all = Transaction::with(['transaction_details', 'transaction_details.menu'])
+            $all = Transaction::with(['transaction_details', 'transaction_details.product'])
                                 ->latest()
                                 ->filter(request(['year', 'month']))
                                 ->paginate(5);
-            $today = Transaction::with(['transaction_details', 'transaction_details.menu'])
+            $today = Transaction::with(['transaction_details', 'transaction_details.product'])
                                 ->whereDate('created_at',Carbon::now())
                                 ->latest()
                                 ->filter(request(['year', 'month']))
                                 ->paginate(5);
-            $thisMonth = Transaction::with(['transaction_details', 'transaction_details.menu'])
+            $thisMonth = Transaction::with(['transaction_details', 'transaction_details.product'])
                                 ->whereMonth('created_at',Carbon::now()->month)
                                 ->latest()
                                 ->filter(request(['year', 'month']))
@@ -72,11 +73,11 @@ class TransactionController extends Controller
     public function create()
     {
         $customers = Customer::all();
-        $menus = Menu::all();
+        $products = Product::with(['productPrice', 'category'])->get();
         $categories = Category::all();
         $tables = Transaction::select('no_table')->where('status','unpaid')->get();
 
-        return view('transaction.create', compact('customers', 'menus', 'categories', 'tables'));
+        return view('transaction.create', compact('customers', 'products', 'categories', 'tables'));
     }
 
     /**

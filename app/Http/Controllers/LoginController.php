@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function index() 
+    public function index()
     {
         return view('login.index');
     }
@@ -27,18 +27,26 @@ class LoginController extends Controller
                 'action' => 'logged in'
             ];
             ActivityLog::create($activity);
-            
+
             $request->session()->regenerate();
+
+            // Inisialisasi outlet_id di session
+            $user = Auth::user()->load('employee');
+            if($user->hasRole('owner')) {
+                $outlet = $user->outlets()->first();
+                session(['outlet_id' => $outlet->id]);
+            }else{
+                $outlet = $user->employee->outlet_id;
+                session(['outlet_id' => $outlet]);
+            }
 
             return redirect()->intended('/');
         }
 
         return back()->with('LoginError', 'Login Failed');
-
-
     }
 
-    public function logout(Request $request) 
+    public function logout(Request $request)
     {
         $id = Auth::id();
         $activity = [

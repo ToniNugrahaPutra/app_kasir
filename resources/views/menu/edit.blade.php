@@ -3,10 +3,20 @@
 @section('title', 'Edit Menu')
 
 @section('container')
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+@if(session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
 <h1 class="app-page-title">Edit Menu</h1>
-<form class="settings-form" action="/menu/{{ $product->id }}" method="post" enctype="multipart/form-data">
+<form class="settings-form" action="{{ route('menu.update', $product->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
-    @method('put')
+    @method('PUT')
     <div class="row g-3 settings-section">
         @error('picture')
             <p class="small text-danger">{{ $message }}</p>
@@ -30,8 +40,8 @@
                     </div>
                     <div class="mb-3">
                         <label for="modal" class="form-label">Harga Modal</label>
-                        <input type="text" class="form-control @error('modal') is-invalid @enderror" id="modal" name="modal" value="{{ old('modal', number_format($product->purchase_price,0,',','.')) }}" required>
-                        @error('modal')
+                        <input type="text" class="form-control @error('modal') is-invalid @enderror" id="purchase_price" name="purchase_price" value="{{ old('purchase_price', number_format($product->purchase_price ?? 0,0,',','.')) }}" required>
+                        @error('purchase_price')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>
@@ -40,9 +50,10 @@
                     <div class="mb-3">
                         <label for="category" class="form-label">Kategori</label>
                         <div class="d-flex justify-content-between mb-1 gap-2">
-                            <select class="form-select" name="category" id="category">
+                            <select class="form-select" name="category_id" id="category_id">
+                                <option value="">Tidak Berkategori</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category', $product->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
                             </select>
                             <a href="/category/create" class="btn btn-primary"><i class="fa-solid fa-plus"></i></a>
@@ -60,21 +71,21 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="price" class="form-label">Harga Umum (satuan)</label>
-                            <input type="text" name="price" class="form-control" id="price" value="{{ old('price', number_format($product->productPrice->where('price_category_id', 1)->first()->price,0,',','.') )}}" required>
+                                <input type="text" name="umumPrice" class="form-control" value="{{ old('umumPrice', number_format($umumPrice,0,',','.') )}}" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="price" class="form-label">Harga Member (satuan)</label>
-                                <input type="text" name="price" class="form-control" id="price" value="{{ old('price', number_format($product->productPrice->where('price_category_id', 3)->first()->price,0,',','.') )}}" placeholder="(jika ada)" required>
+                                <label for="price" class="form-label text-danger">Harga Member (satuan)</label>
+                                <input type="text" name="memberPrice" class="form-control" value="{{ old('memberPrice', number_format($memberPrice,0,',','.') )}}" placeholder="(jika ada)">
                             </div>
                         </div>
                     </div>
                     <div class="row mb-3">
-                        <label class="form-label">Harga Grosir</label>
+                        <label class="form-label">Harga Grosir Umum</label>
                         <div class="card bg-white p-3">
-                            <!-- Harga Grosir -->
-                            <table class="table table-bordered">
+                            <!-- Harga Grosir Umum -->
+                            <table class="table table-borderless" id="grosir-umum">
                                 <thead>
                                 <tr>
                                     <th>Jumlah Min.</th>
@@ -83,18 +94,88 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><input type="number" class="form-control"></td>
-                                    <td><input type="text" class="form-control"></td>
-                                    <td>
-                                        <button class="btn"><i class="fa-solid fa-trash"></i></button>
-                                    </td>
-                                </tr>
+                                @if ($umumGrosir->isNotEmpty())
+                                    @foreach ($umumGrosir as $index => $price)
+                                        <tr>
+                                            <td>
+                                                <input type="number" class="form-control min-quantity" name="grosir-umum[{{ $index }}][min_quantity]" value="{{ $price->min_quantity }}">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control price" name="grosir-umum[{{ $index }}][price]" value="{{ number_format($price->price,0,',','.') }}">
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn" onclick="deleteRow(this)">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td>
+                                            <input type="number" class="form-control" name="grosir-umum[0][min_quantity]" placeholder="Jumlah Min" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control price" name="grosir-umum[0][price]" placeholder="Harga Satuan" required>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger" onclick="deleteRow(this)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endif
                                 </tbody>
                             </table>
+                            <button type="button" class="btn btn-primary" id="add-grosir-umum">Tambah</button>
                         </div>
                     </div>
-                    <button type="submit" class="btn app-btn-info" >Simpan</button>
+                    <div class="row mb-3">
+                        <label class="form-label text-danger">Harga Grosir Member</label>
+                        <div class="card bg-white p-3">
+                            <!-- Harga Grosir Non Member -->
+                            <table class="table table-borderless" id="grosir-member">
+                                <thead>
+                                <tr>
+                                    <th>Jumlah Min.</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if ($memberGrosir->isNotEmpty())
+                                    @foreach ($memberGrosir as $index => $price)
+                                        <tr>
+                                            <td>
+                                                <input type="number" class="min-quantity form-control" name="grosir-member[{{ $index }}][min_quantity]" value="{{ $price->min_quantity }}">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="price form-control" name="grosir-member[{{ $index }}][price]" value="{{ number_format($price->price,0,',','.') }}">
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn" onclick="deleteRow(this)"><i class="fa-solid fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td>
+                                            <input type="number" class="min-quantity form-control" name="grosir-member[0][min_quantity]" placeholder="Jumlah Min" required>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="price form-control" name="grosir-member[0][price]" placeholder="Harga Satuan" required>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn" onclick="deleteRow(this)"><i class="fa-solid fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                @endif
+                                </tbody>
+                            </table>
+                            <button type="button" class="btn btn-primary" id="add-grosir-member">Tambah</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn app-btn-info">Simpan</button>
                     <a href="/menu/" class="btn btn-danger text-white" role="button">Batal</a>
                 </div>
             </div>
@@ -103,7 +184,8 @@
 </form>
 @endsection
 
-@push('script')
+@push('scripts')
+<script src="{{ asset('js/price-edit.js') }}"></script>
 <script>
     const select_picture = document.getElementById('select-picture');
     const input_picture = document.getElementById('input-picture');

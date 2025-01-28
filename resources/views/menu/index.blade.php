@@ -33,25 +33,24 @@
                                                 aria-expanded="false">
                                                 <i class="fa-solid fa-ellipsis-vertical" style="cursor: pointer;"></i>
                                             </div>
-                                            <ul class="dropdown-menu">
-                                                <input type="hidden" value="{{ $menu->id }}" id="menu_id">
+                                            <ul class="bg-white dropdown-menu">
                                                 <li>
-                                                    <a class="dropdown-item" id="show-menu" class="btnbtn-primary"
-                                                        data-bs-toggle="modal" data-bs-target="#show" role="button"><i
-                                                            class="fa-solid fa-eye mx-2"></i> View</a>
+                                                    <a class="dropdown-item" id="show-menu"
+                                                        onclick="showMenu({{ $menu->id }})">
+                                                        <i class="fa-solid fa-eye mx-2"></i> Lihat</a>
                                                 </li>
-                                                <li><a class="dropdown-item" href="menu/{{ $menu->id }}/edit"><i
+                                                <li><a class="dropdown-item" href="{{ route('menu.edit', $menu->id) }}"><i
                                                             class="fa-solid fa-pen-to-square mx-2"></i> Edit</a></li>
                                                 <li>
                                                     <hr class="dropdown-divider">
                                                 </li>
                                                 <li class="delete">
-                                                    <form action="/menu/{{ $menu->id }}" method="POST">
+                                                    <form action="{{ route('menu.destroy', $menu->id) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="dropdown-item border-0 bg-transparent"
-                                                            onclick="return confirm('are you sure?')"><i
-                                                                class="fa-solid fa-trash-can mx-2"></i> Delete</button>
+                                                        <button class="dropdown-item border-0 bg-transparent text-danger"
+                                                            onclick="return confirm('Yakin ingin menghapus?')"><i
+                                                                class="fa-solid fa-trash-can mx-2"></i> Hapus</button>
                                                     </form>
                                                 </li>
                                             </ul>
@@ -70,21 +69,67 @@
         </div>
         @endforeach
 
-        <div class="modal fade" style="margin-top: 9%; margin-left: 9%;" data-bs-backdrop="static" data-bs-keyboard="false"
-            id="show" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
+        <div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="show" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" >
                 <div class="modal-content">
                     <div class="modal-header">
                         <h1 class="modal-title fs-5" id="exampleModalLabel">Detail Menu</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body p-0" id="menu-body">
-
+                        <div class="container-fluid">
+                            <div class="row d-flex">
+                                <div class="col-md">
+                                    <div class="row">
+                                        <div class="col-md-6 p-4 d-flex align-items-center">
+                                            <div class="images">
+                                                <div class="text-center">
+                                                    <img id="menu-image" src="" width="200" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md p-4 rounded-end" style="background-color: #eee;">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <span id="menu-uploaded" class="ml-1 small"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 mb-4">
+                                                <span id="menu-category" class="text-uppercase text-muted brand"></span>
+                                                <h5 id="menu-name" class="text-uppercase"></h5>
+                                                <div class="d-flex flex-row align-items-center">
+                                                    <span id="menu-price" class="text-primary fw-500 small"></span>
+                                                </div>
+                                            </div>
+                                            <p id="menu-description" class="about mt-2"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script src="/js/jquery-3.6.3.min.js"></script>
-    <script src="/js/show.js"></script>
 @endsection
+
+@push('scripts')
+<script>
+    function showMenu(id) {
+        $.ajax({
+            url: "/menu/" + id,
+            success: (data) => {
+                $('#menu-image').attr('src', 'storage/products/' + data.image);
+                $('#menu-uploaded').html('Dibuat : ' + data.tanggalDibuat);
+                $('#menu-category').html(data.category.name);
+                $('#menu-name').html(data.name);
+                $('#menu-price').html('IDR ' + data.price);
+                $('#menu-description').html(data.description);
+
+                $('#show').modal('show');
+            }
+        });
+    }
+</script>
+@endpush

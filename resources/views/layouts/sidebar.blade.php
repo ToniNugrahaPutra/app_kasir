@@ -1,10 +1,12 @@
 @php
     $outlet = App\Models\Outlet::find(session('outlet_id'));
 @endphp
-<div id="app-sidepanel" class="app-sidepanel">
+<div id="app-sidepanel" class="app-sidepanel {{ request()->routeIs('transaction.create') ? 'sidepanel-hidden' : 'sidepanel-visible' }}">
     <div id="sidepanel-drop" class="sidepanel-drop"></div>
     <div class="sidepanel-inner d-flex flex-column" id="sidebar">
-        <a href="" id="sidepanel-close" class="sidepanel-close"><i class="fa-solid fa-xmark"></i></a>
+        <a href="javascript:;" id="sidepanel-close" class="sidepanel-close">
+            <i class="fa-solid fa-xmark"></i>
+        </a>
         <div class="app-branding">
             <a class="app-logo d-flex align-items-center" href="/">
                 <img class="logo-icon" src="{{ $outlet->logo ? asset('storage/logo-toko/'.$outlet->logo) : asset('images/logo-toko.png') }}" alt="logo">

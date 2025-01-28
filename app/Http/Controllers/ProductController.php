@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\ActivityLog;
 use App\Models\ProductPrice;
 use Illuminate\Http\Request;
 use App\Models\PriceCategory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -72,12 +74,13 @@ class ProductController extends Controller
      * @param  \App\Models\Menu  $menu
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, Menu $menu)
+    public function show($id)
     {
-        $id = $request->id;
-        $menu = $menu->find($id);
-        $menu->diff = $menu->created_at->diffForHumans();;
-        return $menu;
+        $productPrice = ProductPrice::where('product_id', $id)->first()->where('price_category_id', 1)->first()->price;
+        $product = Product::with('category')->find($id);
+        $product->tanggalDibuat = $product->created_at->format('d F Y');
+        $product->price = number_format($productPrice, 0, ',', '.');
+        return response()->json($product);
     }
 
     public function edit($id)
@@ -85,67 +88,143 @@ class ProductController extends Controller
         $outletId = session('outlet_id');
         $product = Product::where('id', $id)->where('outlet_id', $outletId)->first();
         $categories = Category::where('outlet_id', $outletId)->get();
-        $productPrice = ProductPrice::where('product_id', $product->id)->get();
+
+        $umumPrice = ProductPrice::where('product_id', $product->id)->where('price_category_id', 1)->first()->price ?? '0';
+        $memberPrice = ProductPrice::where('product_id', $product->id)->where('price_category_id', 3)->first()->price ?? '0';
+        $umumGrosir = ProductPrice::where('product_id', $product->id)->where('price_category_id', 2)->get();
+        $memberGrosir = ProductPrice::where('product_id', $product->id)->where('price_category_id', 4)->get();
+
         $priceCategories = PriceCategory::all();
 
         if(auth()->user()->hasRole('owner')){
-            return view('menu.edit', compact('product', 'categories', 'productPrice', 'priceCategories'));
+            return view('menu.edit', compact('product', 'categories', 'priceCategories', 'umumPrice', 'memberPrice', 'umumGrosir', 'memberGrosir'));
         }
         return redirect()->back();
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Menu  $menu
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Menu $menu)
+    public function update(Request $request, $id)
     {
-        $validateddata = $request->validate([
+        $validated = $request->validate([
             'name' => 'required|min:3',
-            'modal' => 'required|regex:/([0-9]+[.,]*)+/',
-            'price' => 'required|regex:/([0-9]+[.,]*)+/|gte:modal',
-            'category' => 'required',
-            'picture' => 'image|file|max:3048',
-            'description' => 'required'
+            'purchase_price' => 'required|regex:/([0-9]+[.,]*)+/',
+            'category_id' => 'nullable',
+            'umumPrice' => 'required|regex:/([0-9]+[.,]*)+/',
+            'memberPrice' => 'nullable|regex:/([0-9]+[.,]*)+/',
+            'grosir-umum' => 'nullable|array',
+            'grosir-member' => 'nullable|array',
+            'image' => 'nullable|image|file|max:3048',
+            'description' => 'nullable'
         ]);
 
-
-        $validateddata["modal"] = filter_var($request->modal, FILTER_SANITIZE_NUMBER_INT);
-        $validateddata["price"] = filter_var($request->price, FILTER_SANITIZE_NUMBER_INT);
-
-        if ($request->file('picture')) {
-            Storage::delete($menu->picture);
-            $validateddata['picture'] = $request->file('picture')->store('menu');
+        function formatNumber($number){
+            return filter_var($number, FILTER_SANITIZE_NUMBER_INT);
         }
 
-        Menu::where('id', $menu->id)
-             ->update($validateddata);
+        try {
+            DB::beginTransaction();
 
-        $activity = [
-            'user_id' => Auth::id(),
-            'action' => 'edited a menu '.strtolower($menu->name)
-        ];
-        ActivityLog::create($activity);
+            $product = Product::find($id);
 
-        return redirect('/menu')->with('success', 'menu has been updated !');
+            $filename = $product->image;
+            if ($request->file('image')) {
+                Storage::disk('public')->delete('products/'.$product->image);
+                $file = $request->file('image');
+                $filename = $product->id . '-' . time() . '.' . $file->getClientOriginalExtension();
+                Storage::disk('public')->putFileAs('products', $request->file('image'), $filename);
+            }
+
+            Product::where('id', $product->id)
+                ->update([
+                    'name' => $request->name,
+                    'image' => $filename,
+                    'description' => $request->description,
+                    'purchase_price' => formatNumber($request->purchase_price),
+                    'category_id' => $request->category_id,
+                ]);
+
+            ProductPrice::where('product_id', $product->id)
+                ->where('price_category_id', 1)
+                ->update([
+                    'price' => formatNumber($request->umumPrice),
+                    'min_quantity' => 1,
+                ]);
+
+            if($request->has('memberPrice') && $request->memberPrice != 0){
+                ProductPrice::where('product_id', $product->id)
+                ->where('price_category_id', 3)
+                ->delete();
+
+                ProductPrice::create([
+                    'product_id' => $product->id,
+                    'price_category_id' => 3,
+                    'price' => formatNumber($request->memberPrice),
+                    'min_quantity' => 1,
+                ]);
+            }else{
+                ProductPrice::where('product_id', $product->id)
+                    ->where('price_category_id', 3)
+                    ->delete();
+            }
+
+            if($request->has('grosir-umum') && is_array($request->input('grosir-umum'))){
+                ProductPrice::where('product_id', $product->id)
+                    ->where('price_category_id', 2)
+                    ->delete();
+
+                foreach($request->input('grosir-umum') as $grosir){
+                    ProductPrice::create([
+                        'product_id' => $product->id,
+                        'price_category_id' => 2,
+                        'price' => formatNumber($grosir['price']),
+                        'min_quantity' => $grosir['min_quantity'],
+                    ]);
+                }
+            }else{
+                ProductPrice::where('product_id', $product->id)
+                    ->where('price_category_id', 2)
+                    ->delete();
+            }
+
+            if($request->has('grosir-member') && is_array($request->input('grosir-member'))){
+                ProductPrice::where('product_id', $product->id)
+                    ->where('price_category_id', 4)
+                    ->delete();
+
+                foreach($request->input('grosir-member') as $grosir){
+                    ProductPrice::create([
+                        'product_id' => $product->id,
+                        'price_category_id' => 4,
+                        'price' => formatNumber($grosir['price']),
+                        'min_quantity' => $grosir['min_quantity'],
+                    ]);
+                }
+            }else{
+                ProductPrice::where('product_id', $product->id)
+                    ->where('price_category_id', 4)
+                    ->delete();
+            }
+
+            $activity = [
+                'user_id' => Auth::id(),
+                'action' => 'edited a product '. strtolower($product->name)
+            ];
+
+            ActivityLog::create($activity);
+            DB::commit();
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update product: ' . $e->getMessage());
+        }
+
+        return redirect('/menu')->with('success', 'Produk berhasil diperbarui!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Menu  $menu
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Menu $menu)
+    public function destroy(Product $product)
     {
-        Storage::delete($menu->picture);
-        $menu->destroy($menu->id);
+        Storage::delete($product->picture);
+        $product->destroy($product->id);
         $activity = [
             'user_id' => Auth::id(),
-            'action' => 'deleted a menu '.strtolower($menu->name)
+            'action' => 'deleted a product '.strtolower($product->name)
         ];
         ActivityLog::create($activity);
         return redirect('/menu');
