@@ -102,7 +102,7 @@
                                     <td class="cell">
                                         <span class="truncate">
                                             @foreach ($item->transaction_details as $el)
-                                                {{ $el->menu->name.',' }}
+                                                {{ $el->product->name . ',' }}
                                             @endforeach
                                         </span>
                                     </td>
@@ -157,7 +157,7 @@
                                     <td class="cell">
                                         <span class="truncate">
                                             @foreach ($item->transaction_details as $el)
-                                                {{ $el->menu->name.',' }}
+                                                {{ $el->product->name.',' }}
                                             @endforeach
                                         </span>
                                     </td>
@@ -186,9 +186,9 @@
                         <thead>
                             <tr>
                                 <th class="cell">No</th>
-                                <th class="cell">Product</th>
-                                <th class="cell text-center">No Table</th>
-                                <th class="cell">Date</th>
+                                <th class="cell">Produk</th>
+                                <th class="cell text-center">No Meja</th>
+                                <th class="cell">Tanggal</th>
                                 <th class="cell">Status</th>
                                 <th class="cell">Total</th>
                                 @role('cashier')
@@ -211,7 +211,7 @@
                                     <td class="cell">
                                         <span class="truncate">
                                             @foreach ($item->transaction_details as $el)
-                                                {{ $el->menu->name.',' }}
+                                                {{ $el->product->name.',' }}
                                             @endforeach
                                         </span>
                                     </td>

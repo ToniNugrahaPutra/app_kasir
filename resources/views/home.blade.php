@@ -4,7 +4,7 @@
 
 @role('owner')
     @section('container')
-        @include('dashboard.manager')
+        @include('dashboard.owner')
     @endsection
 @endrole
 

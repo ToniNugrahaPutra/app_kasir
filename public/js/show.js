@@ -3,7 +3,7 @@ $(document).ready(function() {
         $(element).on('click', function() {
             $("#menu-body").html(" ");
             $.ajax({
-                url: "/menus/shows?id=" + $("* #menu_id")[index].value,
+                url: "/menu/" + $("* #menu_id")[index].value,
                 success: (res) => {
                     let menuDetail = `<div class="container-fluid">
                                             <div class="row d-flex">

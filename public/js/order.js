@@ -1,7 +1,7 @@
 const Addtocart = document.querySelectorAll('.AddtoCart');
 const Removetocart = document.querySelectorAll('.RemovetoCart');
 
-const menu_item_cart = document.querySelectorAll('.menu-item-cart')
+const menu_item_cart = document.querySelectorAll('.menu-item-cart');
 const cartProduct = document.querySelectorAll('.cart-product');
 const nameProduct = document.querySelectorAll('.product h5');
 const priceProduct = document.querySelectorAll('.product h6');
@@ -10,9 +10,9 @@ let list_Product = [];
 const qty_numbers = document.querySelectorAll('.qty-numbers');
 const menu_order = document.querySelector('.menu-order');
 const clear_order = document.querySelector('.clear-order');
-let arr = []; 
+let arr = [];
 
-let total_price = 0; 
+let total_price = 0;
 let fixed_price = 0;
 const subtotal = document.querySelector('.cart-payment .sub-total');
 const total_transaction = document.querySelector('.cart-payment .total-transaction ');
@@ -34,7 +34,7 @@ Addtocart.forEach((e, i) => {
         if (!arr.includes(i)) {
             arr.push(i);
             list_Product.push({'menu_id' : idProduct, 'qty' : qty, 'price' : parseInt(priceProduct[i].innerText.split(".").join('')) });
-            menu_order.innerHTML += 
+            menu_order.innerHTML +=
             `<div class="cart-product d-flex flex-column rounded mb-4" data-cart="${i}" data-id="">
                 <div class="product-order">
                     <h5 class="text-white ms-4 mt-3" style="font-size: 18px;">${nameProduct[i].innerText}</h5>
@@ -51,7 +51,7 @@ Addtocart.forEach((e, i) => {
         }else {
             list_Product.find(product => product.menu_id == idProduct).qty = qty;
             list_Product.find(product => product.menu_id == idProduct).price = parseInt(priceProduct[i].innerText.split(".").join('')) * qty;
-            document.querySelector(`[data-cart='${i}']`).innerHTML = 
+            document.querySelector(`[data-cart='${i}']`).innerHTML =
             ` <div class="product-order">
                     <h5 class="text-white ms-4 mt-3" style="font-size: 18px;">${nameProduct[i].innerText}</h5>
                     <h6 class="text-white ms-4 mb-3" style="font-size: 12px;">${priceProduct[i].innerText}</h6>
@@ -89,7 +89,7 @@ Removetocart.forEach((e, i) => {
                 list_Product.splice(list_Product.indexOf(list_Product.find((product) => product.menu_id == idProduct)), 1);
             }else {
                 qty = valueQty - 1;
-                document.querySelector(`[data-cart='${i}']`).innerHTML = 
+                document.querySelector(`[data-cart='${i}']`).innerHTML =
                 ` <div class="product-order">
                         <h5 class="text-white ms-4 mt-3" style="font-size: 18px;">${nameProduct[i].innerText}</h5>
                         <h6 class="text-white ms-4 mb-3" style="font-size: 12px;">${priceProduct[i].innerText}</h6>
@@ -134,7 +134,7 @@ for (let i = 0; i < tables.length; i++) {
         list_table.find(b => b.children.item(0).getAttribute("data-number") == tables[i].no_table).children.item(0).src = "../images/table/sold/mejabottom-sold.png";
     } else if(type_tables == "table-D") {
         list_table.find(b => b.children.item(0).getAttribute("data-number") == tables[i].no_table).children.item(0).src = "../images/table/sold/meja3-sold.png";
-    } 
+    }
 }
 
 table.forEach((e, i) => {
@@ -144,7 +144,7 @@ table.forEach((e, i) => {
         let tbl_num = tbl_img.getAttribute("data-number");
         let ifselected = tbl_img.getAttribute("data-table");
         let text = e.children.item(1);
-       
+
         if (type == "table-A") {
             if (ifselected == "selected") {
                 tbl_img.src = "../images/table/meja4.png";
@@ -231,7 +231,7 @@ function deleteOrder() {
     input_transaction.removeAttribute('value')
     menu_id.removeAttribute('value')
     document.getElementById("table_selected").value = ' ';
-    document.querySelector(".tables-selected").innerText = `Table `;
+    document.querySelector(".tables-selected").innerText = `No Meja`;
     table_selected.removeAttribute('value');
     table.forEach((e, i) => {
         let type = e.children.item(0).getAttribute("class");
@@ -288,13 +288,13 @@ function add(e) {
     let price_outers = parseInt(priceProduct[e.parentElement.parentElement.getAttribute('data-cart')].innerText.split(".").join(''));
     let list_menu_id = menu_item_cart[e.parentElement.parentElement.getAttribute('data-cart')].getAttribute('data-id');
     let number_count = parseInt(qty_numbers_outers.innerText) + 1;
-    
+
     list_Product.find(product => product.menu_id == list_menu_id).qty = number_count;
     list_Product.find(product => product.menu_id == list_menu_id).price = price_outers * number_count;
-    
+
     qty_numbers_inner.innerText = number_count;
     qty_numbers_outers.innerText = number_count;
-    
+
     total_price += price_outers;
     fixed_price = total_price + (total_price * 10 / 100);
     subtotal.innerText = `Rp ${formatRupiah(total_price.toString())}`;
@@ -324,7 +324,7 @@ function remove(e) {
         list_Product.find(product => product.menu_id == list_menu_id).price = price_outers * number_count;
         total_price -= price_outers;
         fixed_price = total_price + (total_price * 10 / 100);
-    }    
+    }
 
     subtotal.innerText = `Rp ${formatRupiah(total_price.toString())}`;
     total_transaction.innerText = `Rp ${formatRupiah(fixed_price.toString())}`;

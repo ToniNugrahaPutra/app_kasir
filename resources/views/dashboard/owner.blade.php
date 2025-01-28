@@ -1,4 +1,4 @@
-<div class="col-lg-8 mb-4 shadow rounded d-flex align-items-center bg-transparent">
+<div class="col-lg-7 mb-4 shadow rounded d-flex align-items-center bg-white">
     <div class="card">
         <div class="d-flex align-items-end row">
             <div class="col-sm-7 ps-3">
@@ -33,9 +33,9 @@
     </div>
 </div>
 
-<div class="col-lg-4 col-md-4 order-1">
+<div class="col-lg-5 col-md-4 order-1">
     <div class="row ps-2 d-flex justify-content-evenly">
-        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded">
+        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded bg-white">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
@@ -49,7 +49,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded">
+        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded bg-white">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
@@ -63,7 +63,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded">
+        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded bg-white">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
@@ -72,12 +72,12 @@
                                 class="rounded" />
                         </div>
                     </div>
-                    <span class="fw-semibold d-block mb-1 text-dark">Income</span>
+                    <span class="fw-semibold d-block mb-1 text-dark">Pendapatan</span>
                     <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i>Rp {{ number_format($total_income[0]->total_income,0,',','.') }} </small>
                 </div>
             </div>
         </div>
-        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded">
+        <div class="col-lg-5 col-md-12 col-6 mb-4 shadow rounded bg-white">
             <div class="card">
                 <div class="card-body">
                     <div class="card-title d-flex align-items-start justify-content-between">
@@ -86,7 +86,7 @@
                                 class="rounded" />
                         </div>
                     </div>
-                    <span class="fw-semibold d-block mb-1 text-dark">Invoice</span>
+                        <span class="fw-semibold d-block mb-1 text-dark">Invoice</span>
                     <small class="text-success fw-semibold"><i class="bx bx-up-arrow-alt"></i> {{ $invoice[0]->total_invoice }}</small>
                 </div>
             </div>

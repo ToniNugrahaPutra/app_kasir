@@ -3,7 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
-use App\Http\Controllers\MenuController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -24,15 +24,14 @@ use Illuminate\Support\Facades\Auth;
 |
 */
 
-Route::get('/', [DashboardController::class, 'index'])->middleware('auth');
+Route::get('/', [DashboardController::class, 'index'])->middleware('auth')->name('home');
+Route::get('/choose-outlet', [DashboardController::class, 'chooseOutlet'])->middleware('auth')->name('choose-outlet');
 Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout']);
 
-Route::resource('/menu', MenuController::class)->middleware('auth')->missing(fn () => redirect()->back());
-Route::resource('/transaction', TransactionController::class)->middleware('auth')->missing(fn () => redirect()->back());
-Route::resource('/user', UserController::class)->middleware('auth')->missing(fn () => redirect()->back());
-Route::post('/user/delete', [UserController::class, 'destroy'])->middleware('auth');
+Route::resource('/user', UserController::class)->middleware(['auth', 'role:owner']);
+Route::post('/user/delete', [UserController::class, 'destroy'])->middleware(['auth', 'role:owner']);
 Route::get('/user/edit/{user}', function (User $user) {
     if (!$user->hasRole('owner')) {
         return redirect()->back();
@@ -40,12 +39,14 @@ Route::get('/user/edit/{user}', function (User $user) {
     return view('account.edit', [
         'user' => $user->with('level')->where('id', $user->id)->get()
     ]);
-})->middleware('auth');
+})->middleware(['auth', 'role:owner']);
 Route::post('/user/edit/{user}', [UserController::class, 'updateProfile'])->middleware('auth');
 
-Route::get('/menus/shows', [MenuController::class, 'show']);
+Route::resource('/menu', ProductController::class)->middleware('auth');
 
-Route::get('/activityLog', [ActivityLogController::class, 'index']);
+Route::resource('/transaction', TransactionController::class)->middleware('auth');
+
+Route::get('/activityLog', [ActivityLogController::class, 'index'])->name('activityLog');
 
 Route::get('/invoice/{transaction}', function (Transaction $transaction) {
     return View('transaction.invoice', [

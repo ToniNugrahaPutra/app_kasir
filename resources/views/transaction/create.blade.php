@@ -1,5 +1,23 @@
 @extends('layouts.order')
 
+@push('styles')
+    <style>
+        .sidepanel-hidden {
+            left: -400px;
+        }
+        .sidepanel-visible {
+            left: 0;
+        }
+        .card-image-top {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+@endpush
+
 @section('container')
     @php
         $tables = json_encode($tables);
@@ -12,15 +30,12 @@
     <div class="col-md-8 p-0 h-100 flex flex-column justify-content-between">
         <div class="hd-menu d-flex align-items-center justify-content-between shadow bg-white">
             <div class="col-sm-5 d-flex align-items-center">
-                <a id="sidepanel-toggler" class="sidepanel-toggler d-inline-block d-xl-none" href="#">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"
-                            d="M4 7h22M4 15h22M4 23h22"></path>
-                    </svg>
+                <a id="back-to-dashboard" class="sidepanel-toggler d-inline-block" href="{{ route('home') }}">
+                    <i class="fas fa-arrow-left text-black"></i>
                 </a>
-                <h5 class="fs-5 fw-bold text-black ms-4">All Menu's</h5>
+                <h5 class="fs-5 fw-bold text-black ms-4 mb-0">Daftar Menu</h5>
             </div>
-            {{-- <div class="col-sm-7 d-flex align-items-center search-container-tr">
+            <div class="col-sm-5 d-flex align-items-center search-container-tr">
                 <div class="search-mobile-trigger search-icon-transaction">
                     <i class="search-mobile-trigger-icon fas fa-search"></i>
                 </div>
@@ -31,130 +46,110 @@
                                 class="fas fa-search"></i></button>
                     </form>
                 </div>
-            </div> --}}
+            </div>
         </div>
         <div class="wp-menu d-flex flex-column">
+            <div class="row">
             <div class="menu-tr mt-3 mb-3">
                 <ul class="nav nav-tabs d-flex justify-content-center" data-aos="fade-up" data-aos-delay="200">
                     <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#food">
-                            <h4>Food</h4>
+                        <a class="nav-link active" data-bs-toggle="tab" data-bs-target="#all">
+                            <h4>Semua</h4>
                         </a>
                     </li>
+                    @foreach ($categories as $category)
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#drink">
-                            <h4>Drink's</h4>
+                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#{{ $category->name }}">
+                            <h4>{{ $category->name }}</h4>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" data-bs-target="#dessert">
-                            <h4>Dessert</h4>
-                        </a>
-                    </li>
+                    @endforeach
                 </ul>
+                </div>
             </div>
-            <div class="tab-content menu-tab overflow-auto" style="height: 85%" data-aos="fade-up" data-aos-delay="300">
-                <div class="tab-pane fade active show" id="food">
+            <div class="tab-content menu-tab overflow-hidden" style="height: 85%" data-aos="fade-up" data-aos-delay="300">
+                <div class="tab-pane fade show active" id="all">
+                    <div class="row mt-2 px-3">
+                            @foreach ($products as $product)
+                            <div class="col-md-3 col-sm-6">
+                                <div class="d-flex flex-column bg-white rounded shadow h-100" data-id="{{ $product->id }}">
+                                    <img class="rounded card-image-top" src="{{ asset('storage/products/' . $product->image) }}">
+                                    <div class="d-flex justify-content-center flex-column p-2">
+                                        <p class="text-left mt-2 fs-6 fw-bold text-primary">{{ Str::limit($product->name, 18) }}</p>
+                                        <div class="text-left">
+                                            <small class="text-bold">Rp <span class="fw-bold">{{ number_format($product->productPrice->where('price_category_id', 1)->first()->price ?? 0, 0, ',', '.') }}</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                    </div>
+                </div>
+                @foreach ($categories as $category)
+                <div class="tab-pane fade" id="{{ $category->name }}">
                     <div class="menu-content pe-4 ps-4 d-flex flex-wrap justify-content-between">
-                        @foreach ($foods as $food)
+                        @foreach ($products->where('category_id', $category->id) as $product)
                             <div class="menu-item-cart rounded shadow d-flex align-items-center justify-content-around"
-                                data-id="{{ $food->id }}" style="margin-bottom: 7%;">
-                                <img class="img-fluid" src="{{ asset('storage/' . $food->picture) }}" alt=""
+                                data-id="{{ $product->id }}" style="margin-bottom: 7%;">
+                                <img class="img-fluid" src="{{ asset('storage/products/' . $product->image) }}" alt=""
                                     srcset="" width="150">
                                 <div class="d-flex justify-content-center flex-column">
                                     <div class="product">
-                                        <h5 style="font-size: 16px; width: 100px;" class="text-break">{{ $food->name }}</h5>
-                                        <h6 style="font-size: 13px;">{{ number_format($food->price, 0, ',', '.') }}</h6>
+                                        <h5 style="font-size: 16px; width: 100px;" class="text-break">{{ $product->name }}</h5>
+                                        {{-- <h6 style="font-size: 13px;">{{ number_format($product->retail_price, 0, ',', '.') }}</h6> --}}
                                     </div>
                                     <div class="qty d-flex mt-3">
-                                        <button class="border-0 rounded bg-transparent RemovetoCart"><i
+                                        <button class="border-0 rounded bg-transparent RemovetoCart" data-id="{{ $product->id }}"><i
                                                 class="fa-solid fa-minus" style="font-size: 12px;"></i></button>
                                         <div class="qty-numbers me-3 ms-3">
                                             0
                                         </div>
-                                        <button class="border-0 rounded bg-transparent AddtoCart"><i
+                                        <button class="border-0 rounded bg-transparent AddtoCart" data-id="{{ $product->id }}"><i
                                                 class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
                                     </div>
                                 </div>
                             </div>
                         @endforeach
+                        </div>
                     </div>
-                </div>
-                <div class="tab-pane fade" id="drink">
-                    <div class="menu-content pe-4 ps-4 d-flex flex-wrap justify-content-between">
-                        @foreach ($drinks as $drink)
-                            <div class="menu-item-cart rounded shadow d-flex align-items-center justify-content-around"
-                                data-id="{{ $drink->id }}" style="margin-bottom: 7%;">
-                                <img class="img-fluid" src="{{ asset('storage/' . $drink->picture) }}" alt=""
-                                    srcset="" width="150">
-                                <div class="d-flex justify-content-center flex-column">
-                                    <div class="product">
-                                        <h5 style="font-size: 16px; width: 100px;" class="text-break">{{ $drink->name }}</h5>
-                                        <h6 style="font-size: 13px;">{{ number_format($drink->price, 0, ',', '.') }}</h6>
-                                    </div>
-                                    <div class="qty d-flex mt-3">
-                                        <button class="border-0 rounded bg-transparent RemovetoCart"><i
-                                                class="fa-solid fa-minus" style="font-size: 12px;"></i></button>
-                                        <div class="qty-numbers me-3 ms-3">
-                                            0
-                                        </div>
-                                        <button class="border-0 rounded bg-transparent AddtoCart"><i
-                                                class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="dessert">
-                    <div class="menu-content pe-4 ps-4 d-flex flex-wrap justify-content-between">
-                        @foreach ($desserts as $dessert)
-                            <div class="menu-item-cart rounded shadow d-flex align-items-center justify-content-around"
-                                data-id="{{ $dessert->id }}" style="margin-bottom: 7%;">
-                                <img class="img-fluid" src="{{ asset('storage/' . $dessert->picture) }}" alt=""
-                                    srcset="" width="150">
-                                <div class="d-flex justify-content-center flex-column">
-                                    <div class="product">
-                                        <h5 style="font-size: 16px; width: 100px;" class="text-break">{{ $dessert->name }}</h5>
-                                        <h6 style="font-size: 13px;">{{ number_format($dessert->price, 0, ',', '.') }}</h6>
-                                    </div>
-                                    <div class="qty d-flex mt-3">
-                                        <button class="border-0 rounded bg-transparent RemovetoCart"><i
-                                                class="fa-solid fa-minus" style="font-size: 12px;"></i></button>
-                                        <div class="qty-numbers me-3 ms-3">
-                                            0
-                                        </div>
-                                        <button class="border-0 rounded bg-transparent AddtoCart"><i
-                                                class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
     <div class="col-md-4 h-100 p-0 d-flex flex-column">
         <div class="cart-title d-flex justify-content-between align-items-center p-4 shadow-sm">
-            <h5 class="text-white">Current Order</h5>
-            <button class="fas fa-broom text-white" onclick="deleteOrder()" role="button"></button>
+            <h5 class="text-white">Detail Pesanan</h5>
+            <button class="fas fa-trash text-white" onclick="deleteOrder()" role="button"></button>
         </div>
         <div class="cart-body d-flex flex-column justify-content-between" style="height: 780px;">
             <div class="d-flex justify-content-between p-3 align-items-center">
-                <h6 class="fw-semibold text-white ms-2 tables-selected">Table</h6>
+                <h6 class="fw-semibold text-white ms-2 tables-selected">No Meja</h6>
                 <h6 class="fw-semibold text-white me-2" style="font-size: 13px;">{{ now()->format('Y-m-d') }}</h6>
             </div>
+
+            <div class="align-self-center p-0 m-0" style="width: 90%;">
+            <div class="member-code d-flex justify-content-between align-items-center gap-2 mb-3">
+                <input class="form-control" type="text" name="member_code" id="member_code" placeholder="Kode Member">
+                <button class="btn btn-primary" type="button">Cari</button>
+                </div>
+            </div>
+
             <div class="list-order align-self-center rounded p-4 mb-4">
                 <div class="menu-order">
 
                 </div>
             </div>
-            <form action="/transaction" method="POST" class="align-self-center p-0 m-0" style="width: 90%;">
+            <form action="{{ route('transaction.store') }}" method="POST" class="align-self-center p-0 m-0" style="width: 90%;">
                 @csrf
                 <input type="hidden" name="menu_id" id="menu_id">
                 <input type="hidden" name="no_table" id="table_selected">
-                <div class="cart-payment p-2 d-flex flex-column rounded">
+
+                <div class="discount-code d-flex justify-content-between align-items-center gap-2">
+                    <input class="form-control" type="text" name="discount_code" id="discount_code" placeholder="Kode Diskon / Voucher">
+                    <button class="btn btn-primary" type="button">Terapkan</button>
+                </div>
+
+                <div class="cart-payment p-2 d-flex flex-column rounded mt-3">
                     <div class="subtotal d-flex justify-content-between align-items-center mt-3 p-2"
                         style="height: 40px;">
                         <h6 class="text-white">Subtotal</h6>
@@ -172,14 +167,14 @@
                         <input type="hidden" name="total_transaction">
                     </div>
                     <div class="section-pay d-flex justify-content-between align-items-center p-2">
-                        <h6 class="text-white">Choose Table</h6>
+                        <h6 class="text-white">Pilih Meja</h6>
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#table">Choose</button>
+                            data-bs-target="#table">Pilih Meja</button>
                     </div>
                 </div>
                 <button type="submit"
                     class="w-100 cart-order p-3 mt-3 mb-3 rounded text-center border-0 text-dark bg-white">
-                    Place Order
+                    Buat Pesanan
                 </button>
             </form>
         </div>
@@ -189,7 +184,7 @@
         <div class="modal-dialog modal-dialog modal-xl">
             <div class="modal-content shadow" style="background-color: #181818fd">
                 <div class="modal-header" id="staticBackdropLabel">
-                    <h1 class="modal-title fs-5 text-white" id="exampleModalLabel">Choose table</h1>
+                    <h1 class="modal-title fs-5 text-white" id="exampleModalLabel">Pilih Meja</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         style="background-color: #fff"></button>
                 </div>
@@ -332,11 +327,19 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">Choose</button>
+                    <button type="button" class="btn btn-primary text-white" data-bs-dismiss="modal">Pilih Meja</button>
                 </div>
             </div>
         </div>
     </div>
-    <script src="/js/order.js"></script>
-    <script src="/js/formatmoney.js"></script>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            let sidePanel = $('#app-sidepanel');
+            sidePanel.removeClass('sidepanel-visible');
+            sidePanel.addClass('sidepanel-hidden');
+        });
+    </script>
+@endpush
