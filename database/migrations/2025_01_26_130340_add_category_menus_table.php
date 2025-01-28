@@ -12,9 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('menus', function (Blueprint $table) {
-            $table->renameColumn('category', 'category_id')->default(0);
-            $table->renameColumn('price', 'retail_price');
-            $table->decimal('wholesale_price', 10, 0)->default(0)->after('price');
+            $table->integer('category_id')->default(0)->after('id');
+        });
+
+        Schema::table('menus', function (Blueprint $table) {
+            $table->dropColumn('category');
+        });
+
+        Schema::table('menus', function (Blueprint $table) {
+            $table->decimal('retail_price', 10, 0)->default(0)->after('category_id');
+        });
+
+        Schema::table('menus', function (Blueprint $table) {
+            $table->dropColumn('price');
+        });
+
+        Schema::table('menus', function (Blueprint $table) {
+            $table->decimal('wholesale_price', 10, 0)->default(0)->after('retail_price');
             $table->decimal('member_price', 10, 0)->default(0)->after('wholesale_price');
         });
     }
@@ -25,8 +39,16 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('menus', function (Blueprint $table) {
-            $table->renameColumn('category_id', 'category');
-            $table->renameColumn('retail_price', 'price');
+            $table->integer('category')->default(0)->after('id');
+            $table->decimal('price', 10, 0)->default(0)->after('category');
+        });
+
+        Schema::table('menus', function (Blueprint $table) {
+            $table->dropColumn('category_id');
+            $table->dropColumn('retail_price');
+        });
+
+        Schema::table('menus', function (Blueprint $table) {
             $table->dropColumn('wholesale_price');
             $table->dropColumn('member_price');
         });
