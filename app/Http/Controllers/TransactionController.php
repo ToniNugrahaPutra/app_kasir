@@ -73,8 +73,8 @@ class TransactionController extends Controller
     public function create()
     {
         $customers = Customer::all();
-        $products = Product::with(['productPrice', 'category'])->get();
-        $categories = Category::all();
+        $products = Product::with(['productPrice', 'category'])->where('outlet_id', session('outlet_id'))->get();
+        $categories = Category::where('outlet_id', session('outlet_id'))->get();
         $tables = Transaction::select('no_table')->where('status','unpaid')->get();
 
         return view('transaction.create', compact('customers', 'products', 'categories', 'tables'));

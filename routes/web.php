@@ -1,16 +1,18 @@
 <?php
 
-use App\Http\Controllers\ActivityLogController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Route;
-use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PromoController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\TransactionController;
 
 
 /*
@@ -43,6 +45,11 @@ Route::get('/user/edit/{user}', function (User $user) {
 Route::post('/user/edit/{user}', [UserController::class, 'updateProfile'])->middleware('auth');
 
 Route::resource('/menu', ProductController::class)->middleware('auth');
+Route::get('/menu/detail/{id}', [ProductController::class, 'detail'])->middleware('auth')->name('menu.detail');
+Route::post('/member/search', [CustomerController::class, 'searchMember'])->middleware('auth');
+
+Route::resource('/promo', PromoController::class)->middleware('auth');
+Route::post('/promo/apply', [PromoController::class, 'applyDiscount'])->middleware('auth');
 
 Route::resource('/transaction', TransactionController::class)->middleware('auth');
 
