@@ -7,6 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GudangController;  // Import GudangController
 use Illuminate\Support\Facades\Route;
 use App\Models\Transaction;
 use App\Models\User;
@@ -14,18 +15,19 @@ use Illuminate\Support\Facades\Auth;
 
 
 /*
-|--------------------------------------------------------------------------
+|---------------------------------------------------------------------------
 | Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
+|---------------------------------------------------------------------------
+| Here is where you can register web routes for your application.
+| These routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
 */
 
 Route::get('/', [DashboardController::class, 'index'])->middleware('auth')->name('home');
+
 Route::get('/choose-outlet', [DashboardController::class, 'chooseOutlet'])->middleware('auth')->name('choose-outlet');
+
 Route::get('/login', [LoginController::class, 'index'])->name('login')->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout']);
@@ -50,8 +52,17 @@ Route::get('/activityLog', [ActivityLogController::class, 'index'])->name('activ
 
 Route::get('/invoice/{transaction}', function (Transaction $transaction) {
     return View('transaction.invoice', [
-        'data' => $transaction->with(['transaction_details', 'transaction_details.menu', 'user'])->where('id',$transaction->id)->get()
+        'data' => $transaction->with(['transaction_details', 'transaction_details.menu', 'user'])->where('id', $transaction->id)->get()
     ]);
 });
 
-Route::get('/report', [ReportController::class, 'index'])->middleware('auth');
+Route::get('/report', [ReportController::class, 'index'])->middleware('auth')->name('report');
+
+
+Route::get('/gudang', [GudangController::class, 'index'])->name('gudang.index'); // Halaman utama gudang
+    Route::get('/gudang/product/{id}', [GudangController::class, 'show'])->name('gudang.show'); // Lihat detail produk
+    Route::post('/gudang/manage-stock', [GudangController::class, 'manageStock'])->name('gudang.manageStock'); // Mengelola pergerakan stok
+
+    Route::get('/cek-user', function(){
+        return Auth::user()->roles;
+    });

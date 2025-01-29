@@ -89,6 +89,17 @@
                 </li>
                 @endif
 
+                <!-- {{-- reports --}}
+                @role('owner')
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('report') ? 'active' : '' }}" href="{{ route('report') }}">
+                            <span class="nav-icon">
+                            <i class="fa-solid fa-chart-line"></i></span>
+                            <span class="nav-link-text">Laporan Keuntungan</span>
+                        </a>
+                    </li>
+                @endrole -->
+
                 {{-- activityLog --}}
                 @role('owner')
                 <li class="nav-item">
@@ -101,6 +112,7 @@
                 </li>
                 @endrole
 
+                
             </ul>
         </nav>
     </div>

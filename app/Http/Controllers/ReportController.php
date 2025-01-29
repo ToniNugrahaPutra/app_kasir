@@ -13,83 +13,67 @@ class ReportController extends Controller
     {
         $user = Auth::user();
         $data = '';
+        $profitReport = [];
 
         if ($user->hasRole('owner')) {
+            // Filter transaksi berdasarkan permintaan
+            $query = Transaction::with(['transaction_details', 'transaction_details.product'])
+                                ->where('status', 'paid');
+            
             if ($request->data == 'all') {
-                $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                ->where('status', 'paid')
-                                ->latest()
-                                ->get();
+                $data = $query->latest()->get();
             } elseif ($request->data == 'today') {
-                $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                ->where('status', 'paid')
-                                ->whereDate('created_at',Carbon::now())
-                                ->latest()
-                                ->get();
+                $data = $query->whereDate('created_at', Carbon::now())->latest()->get();
             } elseif ($request->data == 'thisMonth') {
-                $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                ->where('status', 'paid')
-                                ->whereMonth('created_at',Carbon::now()->month)
-                                ->latest()
-                                ->get();
+                $data = $query->whereMonth('created_at', Carbon::now()->month)->latest()->get();
+            } elseif ($request->month) {
+                $data = $query->whereMonth('created_at', $request->month)->latest()->get();
+            } elseif ($request->year) {
+                $data = $query->whereYear('created_at', $request->year)->latest()->get();
             } else {
-                if ($request->month) {
-                    $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                    ->where('status', 'paid')
-                                    ->whereMonth('created_at', $request->month)
-                                    ->latest()
-                                    ->get();
-                } elseif ($request->year) {
-                    $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                    ->where('status', 'paid')
-                                    ->whereYear('created_at', $request->year)
-                                    ->latest()
-                                    ->get();
-                } else {
-                    $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                    ->where('status', 'paid')
-                                    ->whereMonth('created_at', $request->month)
-                                    ->whereYear('created_at', $request->year)
-                                    ->latest()
-                                    ->get();
-                }
+                $data = $query->whereMonth('created_at', $request->month)
+                              ->whereYear('created_at', $request->year)
+                              ->latest()
+                              ->get();
             }
 
+            // Hitung laporan laba-rugi
+            $profitReport = $this->calculateProfitReport($data);
         } else {
-            if ($request->data == 'all') {
-                $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                ->latest()
-                                ->get();
-            } elseif ($request->data == 'today') {
-                $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                ->whereDate('created_at',Carbon::now())
-                                ->latest()
-                                ->get();
-            } elseif ($request->data == 'thisMonth') {
-                $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                ->whereMonth('created_at',Carbon::now()->month)
-                                ->latest()
-                                ->get();
-            } else {
-                if ($request->month) {
-                    $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                    ->whereMonth('created_at', $request->month)
-                                    ->latest()
-                                    ->get();
-                } elseif ($request->year) {
-                    $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                    ->whereYear('created_at', $request->year)
-                                    ->latest()
-                                    ->get();
-                } else {
-                    $data = Transaction::with(['transaction_details', 'transaction_details.menu'])
-                                    ->whereMonth('created_at', $request->month)
-                                    ->whereYear('created_at', $request->year)
-                                    ->latest()
-                                    ->get();
-                }
-            }
+            // Non-owner logic (jika ada)
         }
-        return view('transaction.report', ['data' => $data]);
+
+        return view('transaction.report', [
+            'data' => $data,
+            'profitReport' => $profitReport
+        ]);
+    }
+
+    private function calculateProfitReport($transactions)
+    {
+        $totalRevenue = 0;
+        $totalCost = 0;
+
+        foreach ($transactions as $transaction) {
+            // Menghitung pendapatan berdasarkan harga jual
+            $transactionRevenue = $transaction->transaction_details->sum(function ($detail) {
+                return $detail->quantity * $detail->product->price; // Pastikan produk memiliki atribut price
+            });
+
+            // Menghitung biaya berdasarkan harga pokok produk
+            $transactionCost = $transaction->transaction_details->sum(function ($detail) {
+                return $detail->quantity * $detail->product->purchase_price; // Pastikan produk memiliki atribut purchase_price (biaya)
+            });
+
+            // Menambahkan hasil transaksi ke total
+            $totalRevenue += $transactionRevenue;
+            $totalCost += $transactionCost;
+        }
+
+        return [
+            'totalRevenue' => $totalRevenue,
+            'totalCost' => $totalCost,
+            'profit' => $totalRevenue - $totalCost // Laba = Pendapatan - Biaya
+        ];
     }
 }

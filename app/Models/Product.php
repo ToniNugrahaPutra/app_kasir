@@ -28,4 +28,20 @@ class Product extends Model
     {
         return $this->belongsTo(Outlet::class, 'outlet_id', 'id');
     }
+
+    
+    public function scopeForWarehouseRole($query, $user)
+    {
+        if ($user->hasRole('warehouse')) {
+            return $query->where('outlet_id', $user->outlet_id); 
+        }
+
+        return $query; 
+    }
+
+    
+    public function belongsToOutlet($outletId)
+    {
+        return $this->outlet_id === $outletId;
+    }
 }

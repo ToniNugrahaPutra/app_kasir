@@ -14,4 +14,10 @@
     @endsection
 @endrole
 
+@role('gudang')
+    @section('container')
+        @include('dashboard.gudang')
+    @endsection
+@endrole
+
 @endsection
