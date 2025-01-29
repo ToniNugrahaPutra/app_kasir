@@ -71,51 +71,83 @@
                 <div class="tab-pane fade show active" id="all">
                     <div class="row mt-2 px-3">
                             @foreach ($products as $product)
-                            <div class="col-md-3 col-sm-6">
-                                <div class="d-flex flex-column bg-white rounded shadow h-100" data-id="{{ $product->id }}">
-                                    <img class="rounded card-image-top" src="{{ asset('storage/products/' . $product->image) }}">
-                                    <div class="d-flex justify-content-center flex-column p-2">
-                                        <p class="text-left mt-2 fs-6 fw-bold text-primary">{{ Str::limit($product->name, 18) }}</p>
-                                        <div class="text-left">
-                                            <small class="text-bold">Rp <span class="fw-bold">{{ number_format($product->productPrice->where('price_category_id', 1)->first()->price ?? 0, 0, ',', '.') }}</span></small>
+                                <div class="col-md-3 col-sm-6">
+                                    <a type="button" data-id="{{ $product->id }}" class="decoration-none text-black" onclick="showProductDetail({{ $product->id }})">
+                                    <div class="d-flex flex-column bg-white rounded shadow h-100" data-id="{{ $product->id }}">
+                                        <img class="rounded card-image-top" src="{{ asset('storage/products/' . $product->image) }}">
+                                        <div class="d-flex justify-content-center flex-column p-2">
+                                            <h6 class="text-left mt-2 fs-6 fw-bold text-primary">{{ Str::limit($product->name, 18) }}</h6>
+                                            {{-- <div class="text-left">
+                                                <small class="text-bold">Rp <span class="fw-bold fs-5">{{ number_format($product->productPrice->where('price_category_id', 1)->first()->price ?? 0, 0, ',', '.') }}</span></small>
+                                            </div> --}}
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                             @endforeach
                     </div>
                 </div>
+
                 @foreach ($categories as $category)
                 <div class="tab-pane fade" id="{{ $category->name }}">
-                    <div class="menu-content pe-4 ps-4 d-flex flex-wrap justify-content-between">
+                    <div class="row mt-2 px-3">
                         @foreach ($products->where('category_id', $category->id) as $product)
-                            <div class="menu-item-cart rounded shadow d-flex align-items-center justify-content-around"
-                                data-id="{{ $product->id }}" style="margin-bottom: 7%;">
-                                <img class="img-fluid" src="{{ asset('storage/products/' . $product->image) }}" alt=""
-                                    srcset="" width="150">
-                                <div class="d-flex justify-content-center flex-column">
-                                    <div class="product">
-                                        <h5 style="font-size: 16px; width: 100px;" class="text-break">{{ $product->name }}</h5>
-                                        {{-- <h6 style="font-size: 13px;">{{ number_format($product->retail_price, 0, ',', '.') }}</h6> --}}
-                                    </div>
-                                    <div class="qty d-flex mt-3">
-                                        <button class="border-0 rounded bg-transparent RemovetoCart" data-id="{{ $product->id }}"><i
-                                                class="fa-solid fa-minus" style="font-size: 12px;"></i></button>
-                                        <div class="qty-numbers me-3 ms-3">
-                                            0
-                                        </div>
-                                        <button class="border-0 rounded bg-transparent AddtoCart" data-id="{{ $product->id }}"><i
-                                                class="fa-solid fa-plus" style="font-size: 12px;"></i></button>
-                                    </div>
+                        <div class="col-md-3 col-sm-6">
+                            <a type="button" data-id="{{ $product->id }}" class="decoration-none text-black" onclick="showProductDetail({{ $product->id }})">
+                            <div class="d-flex flex-column bg-white rounded shadow h-100" data-id="{{ $product->id }}">
+                                <img class="rounded card-image-top" src="{{ asset('storage/products/' . $product->image) }}">
+                                <div class="d-flex justify-content-center flex-column p-2">
+                                    <p class="text-left mt-2 fs-6 fw-bold text-primary">{{ Str::limit($product->name, 18) }}</p>
+                                    {{-- <div class="text-left">
+                                        <small class="text-bold">Rp <span class="fw-bold fs-5">{{ number_format($product->productPrice->where('price_category_id', 1)->first()->price ?? 0, 0, ',', '.') }}</span></small>
+                                    </div> --}}
                                 </div>
                             </div>
-                        @endforeach
+                            </a>
                         </div>
+                        @endforeach
                     </div>
+                </div>
                 @endforeach
             </div>
         </div>
     </div>
+
+    {{-- Modal Product Detail with Quantity Set --}}
+    <div class="modal fade" id="productDetail" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog modal-sm">
+            <div class="modal-content shadow" style="background-color: #181818fd">
+                <div class="modal-header" id="staticBackdropLabel">
+                    <h1 class="modal-title fs-5 text-white" id="exampleModalLabel">Detail Pesanan</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="background-color: #fff"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <img id="product-image" class="rounded" src="" alt="" style="width: 100%; height: 200px; object-fit: cover;">
+                    </div>
+                    <div class="row d-flex flex-column justify-content-between align-items-center">
+                        <input type="hidden" id="product-id">
+                        <h6 id="product-name" class="fw-semibold text-white mt-1"></h6>
+                        <h6 id="product-price" class="fw-semibold fs-5" style="color: yellow;"></h6>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 d-flex align-items-center justify-content-between gap-2">
+                            <button type="button" class="btn btn-primary" onclick="decrementQuantity()">-</button>
+                            <input type="text" id="product-quantity" class="form-control text-center" value="1" min="1">
+                            <button type="button" class="btn btn-primary" onclick="incrementQuantity()">+</button>
+                        </div>
+                        <div class="d-flex justify-content-center mt-2">
+                            <button class="btn btn-primary flex-fill" type="button" onclick="addToCart()">Tambah</button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="selected_price_id">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="col-md-4 h-100 p-0 d-flex flex-column">
         <div class="cart-title d-flex justify-content-between align-items-center p-4 shadow-sm">
             <h5 class="text-white">Detail Pesanan</h5>
@@ -123,14 +155,14 @@
         </div>
         <div class="cart-body d-flex flex-column justify-content-between" style="height: 780px;">
             <div class="d-flex justify-content-between p-3 align-items-center">
-                <h6 class="fw-semibold text-white ms-2 tables-selected">No Meja</h6>
+                <h6 class="fw-semibold text-white ms-2 tables-selected">No Meja : <span id="table_selected">-</span></h6>
                 <h6 class="fw-semibold text-white me-2" style="font-size: 13px;">{{ now()->format('Y-m-d') }}</h6>
             </div>
 
             <div class="align-self-center p-0 m-0" style="width: 90%;">
             <div class="member-code d-flex justify-content-between align-items-center gap-2 mb-3">
-                <input class="form-control" type="text" name="member_code" id="member_code" placeholder="Kode Member">
-                <button class="btn btn-primary" type="button">Cari</button>
+                <input class="form-control" type="text" name="member_code" id="member_code" placeholder="Kode Member" autocomplete="off">
+                <button id="search_member" class="btn btn-primary" type="button" onclick="searchMember()">Cari</button>
                 </div>
             </div>
 
@@ -141,24 +173,33 @@
             </div>
             <form action="{{ route('transaction.store') }}" method="POST" class="align-self-center p-0 m-0" style="width: 90%;">
                 @csrf
-                <input type="hidden" name="menu_id" id="menu_id">
+                <input type="hidden" name="listProduct" id="listProduct">
                 <input type="hidden" name="no_table" id="table_selected">
+                <input type="hidden" name="customer_id" id="customer_id">
 
                 <div class="discount-code d-flex justify-content-between align-items-center gap-2">
                     <input class="form-control" type="text" name="discount_code" id="discount_code" placeholder="Kode Diskon / Voucher">
-                    <button class="btn btn-primary" type="button">Terapkan</button>
+                    <button id="apply_discount" class="btn btn-primary" type="button" onclick="applyDiscount()">Terapkan</button>
                 </div>
 
                 <div class="cart-payment p-2 d-flex flex-column rounded mt-3">
-                    <div class="subtotal d-flex justify-content-between align-items-center mt-3 p-2"
+                    {{-- Diskon --}}
+                    <div class="discount-info d-flex justify-content-between align-items-center mt-2 p-2" style="height: 30px;">
+                        <h6 class="text-white">Diskon</h6>
+                        <h6 class="discount-amount text-white">Rp 0</h6>
+                    </div>
+                    <div class="subtotal d-flex justify-content-between align-items-center p-2"
                         style="height: 40px;">
                         <h6 class="text-white">Subtotal</h6>
                         <h6 class="sub-total text-white">Rp 0</h6>
                     </div>
-                    <div class="ppn d-flex justify-content-between align-items-center p-2" style="height: 40px;">
-                        <h6 class="text-white">Ppn</h6>
-                        <h6 class="text-white">10%</h6>
-                        <input type="hidden" name="ppn" value="10%">
+                    <div class="ppn d-flex justify-content-between align-items-center p-2" style="height: 30px;">
+                        <h6 class="text-white">PPN</h6>
+                        <select class="" name="ppn" id="ppn" style="width: 60px;">
+                            <option value="10%">10%</option>
+                            <option value="11%">11%</option>
+                            <option value="12%">12%</option>
+                        </select>
                     </div>
                     <hr class="mt-3 text-white">
                     <div class="section-transaction d-flex justify-content-between align-items-center p-2">
@@ -168,17 +209,21 @@
                     </div>
                     <div class="section-pay d-flex justify-content-between align-items-center p-2">
                         <h6 class="text-white">Pilih Meja</h6>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#table">Pilih Meja</button>
+                        <select class="form-control" name="table_id" id="table_id">
+                            @foreach ($tables as $table)
+                                <option value="{{ $table->id }}">{{ $table->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 <button type="submit"
-                    class="w-100 cart-order p-3 mt-3 mb-3 rounded text-center border-0 text-dark bg-white">
+                    class="w-100 cart-order p-2 mt-3 mb-3 rounded text-center border-0 text-dark bg-white">
                     Buat Pesanan
                 </button>
             </form>
         </div>
     </div>
+    <!-- Modal Table -->
     <div class="modal fade" id="table" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog modal-xl">

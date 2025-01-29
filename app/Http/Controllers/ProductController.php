@@ -102,6 +102,35 @@ class ProductController extends Controller
         return redirect()->back();
     }
 
+    public function detail($id)
+    {
+        $product = Product::with(['productPrice' => function($query) {
+            $query->orderBy('price_category_id', 'asc');
+        }])->find($id);
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Produk tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'id' => $product->id,
+            'name' => $product->name,
+            'image' => $product->image,
+            'description' => $product->description,
+            'product_price' => $product->productPrice->map(function($price) {
+                return [
+                    'id' => $price->id,
+                    'price_category_id' => $price->price_category_id,
+                    'price' => $price->price,
+                    'min_quantity' => $price->min_quantity
+                ];
+            })
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
