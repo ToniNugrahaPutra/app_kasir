@@ -52,6 +52,8 @@ Route::post('/member/search', [CustomerController::class, 'searchMember'])->midd
 
 Route::resource('/promo', PromoController::class)->middleware('auth');
 Route::post('/promo/apply', [PromoController::class, 'applyDiscount'])->middleware('auth');
+Route::get('/active-promos', [PromoController::class, 'getActivePromos']);
+
 
 Route::resource('/transaction', TransactionController::class)->middleware('auth');
 

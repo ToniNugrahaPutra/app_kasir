@@ -61,6 +61,7 @@
                         <ul class="submenu-list list-unstyled">
                             <li class="submenu-item"><a class="submenu-link {{ request()->routeIs('menu.index') ? 'active' :  ''}}" href="{{ route('menu.index') }}">Semua Menu</a></li>
                             <li class="submenu-item"><a class="submenu-link {{ request()->routeIs('menu.create') ? 'active' :  ''}}" href="{{ route('menu.create') }}">Tambah Menu</a></li>
+
                         </ul>
                     </div>
                 </li>
@@ -78,11 +79,13 @@
                             <i class="fa-solid fa-chevron-down arrow"></i>
                         </span>
                     </a>
-                    <div id="submenu-2" class="collapse submenu submenu-2 {{ request()->routeIs('transaction.index') ? 'collapse show' : (request()->routeIs('transaction.create') ? 'collapse show' : 'collapse') }}" data-bs-parent="#menu-accordion">
+                    <div id="submenu-2" class="collapse submenu submenu-2 {{ request()->routeIs('transaction.index') || request()->routeIs('promo.index') ? 'collapse show' : (request()->routeIs('transaction.create') ? 'collapse show' : 'collapse') }}" data-bs-parent="#menu-accordion">
                         <ul class="submenu-list list-unstyled">
                             @if(Auth::user()->hasRole('owner') || Auth::user()->hasRole('cashier'))
                             <li class="submenu-item"><a class="submenu-link {{ request()->routeIs('transaction.index') ? 'active' :  ''}}" href="{{ route('transaction.index') }}">Semua Transaksi</a></li>
+                            <li class="submenu-item"><a class="submenu-link {{ request()->routeIs('promo.index') ? 'active' :  ''}}" href="{{ route('promo.index') }}">Tambah Promo</a></li>
                             <li class="submenu-item"><a class="submenu-link {{ request()->routeIs('transaction.create') ? 'active' :  ''}}" href="{{ route('transaction.create') }}">Buat Pesanan</a></li>
+
                             @endif
                         </ul>
                     </div>

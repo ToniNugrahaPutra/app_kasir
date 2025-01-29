@@ -42,7 +42,6 @@ class ReportController extends Controller
         } else {
             // Non-owner logic (jika ada)
         }
-
         return view('transaction.report', [
             'data' => $data,
             'profitReport' => $profitReport
@@ -55,25 +54,19 @@ class ReportController extends Controller
         $totalCost = 0;
 
         foreach ($transactions as $transaction) {
-            // Menghitung pendapatan berdasarkan harga jual
-            $transactionRevenue = $transaction->transaction_details->sum(function ($detail) {
-                return $detail->quantity * $detail->product->price; // Pastikan produk memiliki atribut price
-            });
-
-            // Menghitung biaya berdasarkan harga pokok produk
-            $transactionCost = $transaction->transaction_details->sum(function ($detail) {
-                return $detail->quantity * $detail->product->purchase_price; // Pastikan produk memiliki atribut purchase_price (biaya)
-            });
-
-            // Menambahkan hasil transaksi ke total
-            $totalRevenue += $transactionRevenue;
-            $totalCost += $transactionCost;
+            $totalRevenue += $transaction->total_transaction; // Use transaction total
+            foreach ($transaction->transaction_details as $detail) {
+                $totalCost += $detail->qty * $detail->product->purchase_price;
+            }
         }
 
+        // Return array containing all financial details
         return [
-            'totalRevenue' => $totalRevenue,
-            'totalCost' => $totalCost,
-            'profit' => $totalRevenue - $totalCost // Laba = Pendapatan - Biaya
+            'revenue' => $totalRevenue,
+            'cost' => $totalCost,
+            'profit' => $totalRevenue - $totalCost
         ];
     }
-}
+
+    }
+

@@ -49,49 +49,56 @@
         <!-- Report Table -->
         <table class="table my-5">
             <thead>
-                <tr>
-                    <th scope="col">Transaction Date</th>
-                    <th scope="col">Products</th>
-                    <th scope="col">Table No</th>
-                    <th scope="col">Total</th>
-                    @role('owner')
-                    <th scope="col">Cost</th>
-                    <th scope="col">Profit</th>
-                    @endrole
-                </tr>
+            <tr>
+            <th scope="col">Transaction Date</th>
+            <th scope="col">Products</th>
+            <th scope="col">No Meja</th>
+            <th scope="col">Total Penjualan</th>
+            @role('owner')
+            <th scope="col">Total Harga Barang </th>
+            <th scope="col">Keuntungan</th>
+            @endrole
+            </tr>
             </thead>
             <tbody>
-                @foreach ($data as $item)
-                <tr>
-                    <td>{{ $item->created_at->format('d M Y') }}</td>
-                    <td>
-                        @foreach ($item->transaction_details as $detail)
-                            {{ $detail->product->name }} (x{{ $detail->quantity }})<br>
-                        @endforeach
-                    </td>
-                    <td>{{ $item->no_table }}</td>
-                    <td>Rp {{ number_format($item->total_transaction, 0, ',', '.') }}</td>
-                    @role('owner')
-                    <td>
-                        Rp {{ number_format($item->transaction_details->sum(fn($d) => $d->quantity * $d->product->purchase_price), 0, ',', '.') }}
-                    </td>
-                    <td>
-                        Rp {{ number_format($item->transaction_details->sum(fn($d) => ($d->product->price - $d->product->purchase_price) * $d->quantity), 0, ',', '.') }}
-                    </td>
-                    @endrole
-                </tr>
-                @endforeach
+            @forelse ($data as $item)
+            <tr>
+            <td>{{ $item->created_at->format('d M Y') }}</td>
+            <td>
+            @foreach ($item->transaction_details as $detail)
+            {{ $detail->product->name }} (x{{ $detail->qty }})<br>
+            @endforeach
+            </td>
+            <td>{{ $item->no_table }}</td>
+            <td>Rp {{ number_format($item->total_transaction, 0, ',', '.') }}</td>
+            @role('owner')
+            <?php
+            $totalCost = 0;
+            foreach ($item->transaction_details as $detail) {
+                $totalCost += $detail->qty * $detail->product->purchase_price;
+            }
+            $profit = $item->total_transaction - $totalCost;
+            ?>
+            <td>Rp {{ number_format($totalCost, 0, ',', '.') }}</td>
+            <td>Rp {{ number_format($profit, 0, ',', '.') }}</td>
+            @endrole
+            </tr>
+            @empty
+            <tr>
+            <td colspan="6" class="text-center">No transactions found</td>
+            </tr>
+            @endforelse
             </tbody>
+            @role('owner')
             <tfoot>
-                <tr>
-                    @role('owner')
-                    <th colspan="3" class="text-end">Total Revenue:</th>
-                    <td>Rp {{ isset($profitReport['totalRevenue']) ? number_format($profitReport['totalRevenue'], 0, ',', '.') : '0' }}</td>
-                    <td>Rp {{ isset($profitReport['totalCost']) ? number_format($profitReport['totalCost'], 0, ',', '.') : '0' }}</td>
-                    <td>Rp {{ isset($profitReport['profit']) ? number_format($profitReport['profit'], 0, ',', '.') : '0' }}</td>
-                    @endrole
-                </tr>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td>Rp {{ number_format($profitReport['revenue'], 0, ',', '.') }}</td>
+                <td>Rp {{ number_format($profitReport['cost'], 0, ',', '.') }}</td>
+                <td>Rp {{ number_format($profitReport['profit'], 0, ',', '.') }}</td>
+            </tr>
             </tfoot>
+            @endrole
         </table>
 
         <!-- Print Button -->
