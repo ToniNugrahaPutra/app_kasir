@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\OutletController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
@@ -75,3 +76,5 @@ Route::get('/gudang', [GudangController::class, 'index'])->name('gudang.index');
     Route::get('/cek-user', function(){
         return Auth::user()->roles;
     });
+
+    Route::put('/outlet/qris', [OutletController::class, 'qris'])->name('outlets.qris');
