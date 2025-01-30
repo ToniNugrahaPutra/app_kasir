@@ -19,15 +19,17 @@
 @endpush
 
 @section('container')
-    @php
-        $tables = json_encode($tables);
-        echo "
-            <script>
-                var tables = $tables;
-            </script>
-        ";
-    @endphp
     <div class="col-md-8 p-0 h-100 flex flex-column justify-content-between">
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="hd-menu d-flex align-items-center justify-content-between shadow bg-white">
             <div class="col-sm-5 d-flex align-items-center">
                 <a id="back-to-dashboard" class="sidepanel-toggler d-inline-block" href="{{ route('home') }}">
@@ -175,7 +177,8 @@
                 @csrf
                 <input type="hidden" name="listProduct" id="listProduct">
                 <input type="hidden" name="no_table" id="table_selected">
-                <input type="hidden" name="customer_id" id="customer_id">
+                <input type="hidden" name="customer_id" id="customer_id" value="1">
+                <input type="hidden" name="outlet_id" id="outlet_id" value="{{ session('outlet_id') }}">
 
                 <div class="discount-code d-flex justify-content-between align-items-center gap-2">
                     <input class="form-control" type="text" name="discount_code" id="discount_code" placeholder="Kode Diskon / Voucher">
@@ -186,16 +189,17 @@
                     {{-- Diskon --}}
                     <div class="discount-info d-flex justify-content-between align-items-center mt-2 p-2" style="height: 30px;">
                         <h6 class="text-white">Diskon</h6>
-                        <h6 class="discount-amount text-white">Rp 0</h6>
+                        <h6 id="discount-amount" class="discount-amount text-white">Rp 0</h6>
                     </div>
                     <div class="subtotal d-flex justify-content-between align-items-center p-2"
                         style="height: 40px;">
                         <h6 class="text-white">Subtotal</h6>
-                        <h6 class="sub-total text-white">Rp 0</h6>
+                        <h6 id="sub-total" class="sub-total text-white">Rp 0</h6>
                     </div>
                     <div class="ppn d-flex justify-content-between align-items-center p-2" style="height: 30px;">
                         <h6 class="text-white">PPN</h6>
                         <select class="" name="ppn" id="ppn" style="width: 60px;">
+                            <option value="0%">Tanpa PPN</option>
                             <option value="10%">10%</option>
                             <option value="11%">11%</option>
                             <option value="12%">12%</option>
@@ -209,9 +213,10 @@
                     </div>
                     <div class="section-pay d-flex justify-content-between align-items-center p-2">
                         <h6 class="text-white">Pilih Meja</h6>
-                        <select class="form-control" name="table_id" id="table_id">
+                        <select class="form-control" name="table_id" id="table_id" style="width: 100px;">
+                            <option value="">Tanpa Meja</option>
                             @foreach ($tables as $table)
-                                <option value="{{ $table->id }}">{{ $table->name }}</option>
+                                <option value="{{ $table->id }}">{{ $table->table_number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -224,7 +229,7 @@
         </div>
     </div>
     <!-- Modal Table -->
-    <div class="modal fade" id="table" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    {{-- <div class="modal fade" id="table" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog modal-xl">
             <div class="modal-content shadow" style="background-color: #181818fd">
@@ -376,7 +381,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 @endsection
 
 @push('scripts')

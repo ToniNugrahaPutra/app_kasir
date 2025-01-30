@@ -592,10 +592,16 @@ function applyDiscount() {
                     title: 'Berhasil',
                     text: 'Diskon berhasil diterapkan!'
                 });
-
+                console.log(response);
+                // logika untuk menampilkan diskon
+                $('#discount_amount').html(`- Rp ${response.discountAmount.toLocaleString('id-ID')}`);
+                $('#sub-total').html(`Rp ${response.totalPrice.toLocaleString('id-ID')}`);
+                total_price = response.totalPrice;
+                fixed_price = total_price + (total_price * ppn / 100);
                 $('#apply_discount').prop('disabled', true);
                 $('#apply_discount').html('<i class="fa-solid fa-check"></i>');
                 $('#discount_code').prop('disabled', true);
+
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -619,5 +625,7 @@ function applyDiscount() {
         }
     });
 }
+
+
 
 

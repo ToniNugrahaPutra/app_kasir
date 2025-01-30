@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Table;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Customer;
@@ -75,46 +76,53 @@ class TransactionController extends Controller
         $customers = Customer::all();
         $products = Product::with(['productPrice', 'category'])->where('outlet_id', session('outlet_id'))->get();
         $categories = Category::where('outlet_id', session('outlet_id'))->get();
-        $tables = Transaction::select('no_table')->where('status','unpaid')->get();
+        $tables = Table::where('outlet_id', session('outlet_id'))->get();
 
         return view('transaction.create', compact('customers', 'products', 'categories', 'tables'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $transaction = $request->validate([
-            'no_table' => 'required',
-            'total_transaction' => 'required'
-        ]);
-        $transaction['user_id'] = auth()->user()->id;
-        $transaction['total_payment'] = 0;
-        $transaction['status'] = 'unpaid';
-        $transaction['created_at'] = Carbon::now();
-        $transaction['updated_at'] = Carbon::now();
 
-        $id = Transaction::insertGetId($transaction);
+        if($request->has('ppn')) {
+            $ppn = filter_var($request->ppn, FILTER_SANITIZE_NUMBER_INT);
+        }
 
-        $transactionDetail = $request->validate([
-            'menu_id' => 'required'
-        ]);
+        $dataProduct = json_decode($request->listProduct);
 
-        $menu_id = json_decode($request->menu_id);
+        try {
+            $transaction = new Transaction();
+            $transaction->user_id = auth()->user()->id;
+            $transaction->outlet_id = $request->outlet_id;
+            $transaction->customer_id = $request->customer_id;
+            $transaction->total_transaction = $request->total_transaction;
+            $transaction->total_payment = 0;
+            $transaction->discount_amount = $request->discount_amount ?? null;
+            $transaction->ppn = $ppn ?? null;
+            $transaction->no_table = $request->table_id ?? null;
+            $transaction->status = 'unpaid';
+            $transaction->save();
 
-        for ($i=0; $i < count($menu_id); $i++) {
-            $transactionDetail['transaction_id'] = $id;
-            $transactionDetail['menu_id'] = $menu_id[$i]->menu_id;
-            $transactionDetail['qty'] = $menu_id[$i]->qty;
-            $transactionDetail['price'] = $menu_id[$i]->price;
-            TransactionDetail::create($transactionDetail);
-        };
+            foreach($dataProduct as $product) {
+                $transactionDetail = new TransactionDetail();
+                $transactionDetail->transaction_id = $transaction->id;
+                $transactionDetail->product_id = $product->id;
+                $transactionDetail->qty = $product->qty;
+                $transactionDetail->price = $product->price;
+                $transactionDetail->save();
+            }
 
-        return redirect('/transaction')->with('success', 'New transaction successfully created !');
+            $transaction->total_transaction = $transaction->transaction_details->sum(function($detail) {
+                return $detail->price * $detail->qty;
+            });
+            $transaction->save();
+
+            return redirect()->route('transaction.index')->with('success', 'New transaction successfully created !');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('transaction.index')->with('success', 'New transaction successfully created !');
     }
 
     /**
