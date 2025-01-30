@@ -21,4 +21,9 @@ class Promo extends Model
         'usage_count',
         'is_active'
     ];
+
+    protected $dates = [
+        'start_date',
+        'end_date'
+    ];
 }
